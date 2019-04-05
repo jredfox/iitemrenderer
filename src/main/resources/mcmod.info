@@ -1,0 +1,16 @@
+[
+{
+  "modid": "iitemrenderer",
+  "name": "IItemRenderer Mod",
+  "description": "Dynamic Advanced Rendering for Items is back",
+  "version": "0.5",
+  "mcversion": "1.12.2",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["elix_x,jredfox"],
+  "credits": "The Forge and FML guys, for making this example",
+  "logoFile": "logo.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]

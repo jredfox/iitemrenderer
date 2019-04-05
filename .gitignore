@@ -1,0 +1,16 @@
+﻿#Ignore EVERYTHING
+/*
+
+!src/
+!gradle/
+!libs/
+
+!build.gradle
+!gradlew
+!gradlew.bat
+
+!.gitignore
+
+#Don't ignore license
+!LICENCE
+!README.md

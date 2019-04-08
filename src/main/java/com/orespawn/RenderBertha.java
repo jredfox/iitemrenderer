@@ -37,7 +37,7 @@ public class RenderBertha implements IItemRenderer {
       GL11.glRotatef(-90.0F, 0.0F, 0.0F, 1.0F);
       GL11.glScalef(scale, scale, scale);
       GL11.glTranslatef(x, y, z);
-      Minecraft.getMinecraft().renderEngine.bindTexture(texture);
+   	  Minecraft.getMinecraft().renderEngine.bindTexture(texture);
       this.modelBertha.render();
       GL11.glPopMatrix();
    }

@@ -37,12 +37,11 @@ public class RenderItemObj extends RenderItem {
 	public void renderItem(ItemStack itemstack, IBakedModel model)
 	{	
         IItemRendererHandler.updateMipMap();//sync mipmaps if not in recursion loop
-		
-        if(IItemRendererHandler.isRunning)
+		if(IItemRendererHandler.isRunning)
 		{
-			IItemRendererHandler.startBlurMipmap();//make sure in recursion loops this gets set and at the end of the loop it gets set with whatever it was before
+			 IItemRendererHandler.startBlurMipmap();//make sure in recursion loops this gets set and at the end of the loop it gets set with whatever it was before
 		}
-        
+		
 		IItemRenderer renderer = IItemRendererHandler.getIItemRenderer(itemstack);
 		if(renderer != null)
 		{
@@ -68,7 +67,7 @@ public class RenderItemObj extends RenderItem {
             		IItemRendererHandler.updateLastPossiblePos(IItemRendererHandler.ORIGIN);//we don't know if this is calling it recursively so don't assume that it's not running
             	}
             }
-    		
+            
     		boolean fancy = this.mc.gameSettings.fancyGraphics;
             IItemRendererHandler.isRunning = true;
     		if(fancy)

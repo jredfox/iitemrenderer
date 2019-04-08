@@ -12,16 +12,28 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 public class IItemRendererHandler {
 
 	private static Map<Item, IItemRenderer> renderers = new HashMap<>();
 	public static RenderItemObj instance;
+	
+	/**
+	 * mipmapping lastBlur before starting this rendering process
+	 */
+	public static boolean lastBlur;
+	/**
+	 * mipmapping lastMipMap before starting this rendering process
+	 */
+	public static boolean lastMipmap;
 	
 	public static double lastX;
 	public static double lastY;
@@ -173,12 +185,6 @@ public class IItemRendererHandler {
 		return Minecraft.getMinecraft().renderItem;
 	}
 	
-	public static void restoreLastBlurMipmap()
-	{
-		Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
-	}
-	
 	/**
 	 * update last known pos if not currently running so an entity item starts the intial render the isRunning will be false thus update it
 	 */
@@ -190,11 +196,25 @@ public class IItemRendererHandler {
 		}
 	}
 	
+	/**
+	 * update the holder's data to a position with a non existent entity
+	 */
 	public static void updateLastPossiblePos(BlockPos origin) 
 	{
 		if(!isRunning)
 		{
 			updateLastPosForcibly(origin);
+		}
+	}
+	
+	public static void updateMipMap()
+	{
+		if(!isRunning)
+		{
+			instance.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			AbstractTexture texture = (AbstractTexture) instance.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			lastBlur = texture.blurLast;
+			lastMipmap = texture.mipmapLast;
 		}
 	}
 	
@@ -224,6 +244,68 @@ public class IItemRendererHandler {
 		lastPitch = 0.0F;
 		lastYawHead = 0.0F;
 		lastEntity = null;
+	}
+	
+	public static void startBlurMipmap()
+	{
+		Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		AbstractTexture texture = (AbstractTexture) Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		texture.setBlurMipmap(false, false);
+		texture.blurLast = lastBlur;
+		texture.mipmapLast = lastMipmap;
+	}
+	
+	public static void restoreLastBlurMipmap()
+	{
+		Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        AbstractTexture texture = (AbstractTexture) Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        texture.blurLast = lastBlur;
+        texture.mipmapLast = lastMipmap;
+	}
+
+	public static final ResourceLocation GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
+	/**
+	 * WIP doesnt' work yet do not use investigating color and how this can actually be applied
+	 * @param model
+	 */
+	public static void renderModelEffect(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks) 
+	{
+        GlStateManager.depthMask(false);
+        GlStateManager.depthFunc(514);
+        GlStateManager.disableLighting();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_COLOR, GlStateManager.DestFactor.ONE);
+        instance.mc.getTextureManager().bindTexture(GLINT);
+        GlStateManager.matrixMode(5890);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(8.0F, 8.0F, 8.0F);
+        float f = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F / 8.0F;
+        GlStateManager.translate(f, 0.0F, 0.0F);
+        GlStateManager.rotate(-50.0F, 0.0F, 0.0F, 1.0F);
+        
+        if(true)
+        {
+        	renderer.render(stack, model, type, partialTicks);//TODO:
+        }
+//        this.renderModel(model, -8372020);
+        GlStateManager.popMatrix();
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(8.0F, 8.0F, 8.0F);
+        float f1 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F / 8.0F;
+        GlStateManager.translate(-f1, 0.0F, 0.0F);
+        GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
+        
+        if(true)
+        {
+        	renderer.render(stack, model, type, partialTicks);//TODO:
+        }
+//        this.renderModel(model, -8372020);
+        GlStateManager.popMatrix();
+        GlStateManager.matrixMode(5888);
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.enableLighting();
+        GlStateManager.depthFunc(515);
+        GlStateManager.depthMask(true);
+        instance.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 	}
 
 }

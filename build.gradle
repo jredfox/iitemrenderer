@@ -75,10 +75,12 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+	rename '(.+_at.cfg)', 'META-INF/$1'
 }
 jar {
     manifest {
-        attributes 'FMLCorePlugin': 'com.evilnotch.iitemrender.asm.Plugin'
-        attributes 'FMLCorePluginContainsFMLMod': 'false'
+        attributes 'FMLCorePlugin': 'com.evilnotch.iitemrender.asm.Plugin',
+        'FMLCorePluginContainsFMLMod': 'false',
+		'FMLAT': 'iitemrenderer_at.cfg'
     }
 }

@@ -17,7 +17,7 @@ public class IItemRendererMod {
 
 	public static final String MODID = "iitemrenderer";
 	public static final String NAME = "IItem Renderer";
-	public static final String VERSION = "0.8.3";
+	public static final String VERSION = "0.9";
 	
 	/**
 	 * add jei support to the tabs

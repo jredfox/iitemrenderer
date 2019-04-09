@@ -1,7 +1,6 @@
 # IItem Renderer
-IItem Renderer API gives you ability to hook into item rendering. More specifically:
 - Use GL calls during item rendering.
-- Super-ultra-hyper-dynamic rendering.
+- Allow animations and dynamic rendering
 - Change GUI overlay.
 - Acess to camera transformations
 - Acess to item stack's NBT

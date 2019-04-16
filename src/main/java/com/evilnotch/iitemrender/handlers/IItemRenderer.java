@@ -66,5 +66,14 @@ public interface IItemRenderer {
 	{
 		renderOverlay(fr, itemstack, xPosition, yPosition, text);
 	}
+	
+	/**
+	 * by default most iitemrenderers can just simply render the whole thing again without the model changing each call for the enchantment effect. if it does then simply override this
+	 * note: binding textures will not occur here without re-enabling them first {@link IItemRendererHandler#canBind}
+	 */
+	public default void renderEffect(ItemStack stack, IBakedModel model, TransformType type, float partialTicks)
+	{
+		render(stack, model, type, partialTicks);
+	}
 
 }

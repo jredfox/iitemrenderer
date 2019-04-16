@@ -158,6 +158,7 @@ public class IItemRendererHandler {
 	{	
 		//TESR support
 		GlStateManager.pushMatrix();
+		
 		if (model.isBuiltInRenderer())
         {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -173,6 +174,7 @@ public class IItemRendererHandler {
         {
         	render.renderEffect(model);
         }
+        
         GlStateManager.popMatrix();
 	}
 	
@@ -265,40 +267,110 @@ public class IItemRendererHandler {
 	
 	public static boolean enchants = false;
 	public static final ResourceLocation GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
+	public static float enchR = 0.5019608F;
+	public static float enchG = 0.2509804F;
+	public static float enchB = 0.8F;
+	public static boolean canBind = true;
+	
 	/**
-	 * WIP not implemented fully yet
+	 * do not call this outside of your model matrix
+	 * do not bind textures in your iitemrenderer when rendering the enchantments
 	 */
 	public static void renderModelEffect(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks) 
 	{
+		renderModelEffect(renderer, stack, model, type, partialTicks, enchR, enchG, enchB);
+	}
+	
+	/**
+	 * do not call this outside of your model matrix
+	 * do not bind textures in your iitemrenderer when rendering the enchantments
+	 * the rgb vars are float rgb for the enchantment color overlay
+	 */
+	public static void renderModelEffect(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks, float r, float g, float b) 
+	{
 		if(enchants)
 			return;//prevent recursion loops
+		
 		enchants = true;
+        GlStateManager.color(r, g, b);
 		Minecraft mc = instance.mc;
         GlStateManager.depthMask(false);
         GlStateManager.depthFunc(514);
         GlStateManager.disableLighting();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_COLOR, GlStateManager.DestFactor.ONE);
         mc.getTextureManager().bindTexture(GLINT);
+        canBind = false;
         GlStateManager.matrixMode(5890);
         GlStateManager.pushMatrix();
         GlStateManager.scale(8.0F, 8.0F, 8.0F);
         float f = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F / 8.0F;
         GlStateManager.translate(f, 0.0F, 0.0F);
         GlStateManager.rotate(-50.0F, 0.0F, 0.0F, 1.0F);
-        renderIItemRenderer(renderer, stack, model, type, partialTicks);
+        renderer.renderEffect(stack, model, type, partialTicks);
         GlStateManager.popMatrix();
         GlStateManager.pushMatrix();
         GlStateManager.scale(8.0F, 8.0F, 8.0F);
         float f1 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F / 8.0F;
         GlStateManager.translate(-f1, 0.0F, 0.0F);
         GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
-        renderIItemRenderer(renderer, stack, model, type, partialTicks);
+        renderer.renderEffect(stack, model, type, partialTicks);
         GlStateManager.popMatrix();
         GlStateManager.matrixMode(5888);
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.enableLighting();
         GlStateManager.depthFunc(515);
         GlStateManager.depthMask(true);
+        canBind = true;
+        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		enchants = false;
+	}
+	
+	/**
+	 * render enchantments onto a TEISR note that this needs to get called inside of your TEISR and needs to be all one matrix in order to work properly
+	 */
+	public static void renderTEISRModelEffect(ItemStack stack) 
+	{
+		renderTEISRModelEffect(stack, enchR, enchG, enchB);
+	}
+	
+	/**
+	 * render enchantments onto a TEISR note that this needs to get called inside of your TEISR and needs to be all one matrix in order to work properly
+	 */
+	public static void renderTEISRModelEffect(ItemStack stack, float r, float g, float b) 
+	{
+		if(enchants)
+			return;//prevent recursion loops
+		
+		enchants = true;
+        GlStateManager.color(r, g, b);
+		Minecraft mc = instance.mc;
+        GlStateManager.depthMask(false);
+        GlStateManager.depthFunc(514);
+        GlStateManager.disableLighting();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_COLOR, GlStateManager.DestFactor.ONE);
+        mc.getTextureManager().bindTexture(GLINT);
+        canBind = false;
+        GlStateManager.matrixMode(5890);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(8.0F, 8.0F, 8.0F);
+        float f = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F / 8.0F;
+        GlStateManager.translate(f, 0.0F, 0.0F);
+        GlStateManager.rotate(-50.0F, 0.0F, 0.0F, 1.0F);
+        stack.getItem().getTileEntityItemStackRenderer().renderByItem(stack);
+        GlStateManager.popMatrix();
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(8.0F, 8.0F, 8.0F);
+        float f1 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F / 8.0F;
+        GlStateManager.translate(-f1, 0.0F, 0.0F);
+        GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
+        stack.getItem().getTileEntityItemStackRenderer().renderByItem(stack);
+        GlStateManager.popMatrix();
+        GlStateManager.matrixMode(5888);
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.enableLighting();
+        GlStateManager.depthFunc(515);
+        GlStateManager.depthMask(true);
+        canBind = true;
         mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		enchants = false;
 	}

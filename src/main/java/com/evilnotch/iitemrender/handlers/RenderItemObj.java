@@ -55,6 +55,8 @@ public class RenderItemObj extends RenderItem {
             GlStateManager.enableRescaleNormal();
   
             TransformType t = IItemRendererHandler.currentTransformType;
+            float pt = this.mc.getRenderPartialTicks();
+            
             if(t == t.GUI || t == t.FIRST_PERSON_RIGHT_HAND  || t == t.FIRST_PERSON_LEFT_HAND || t == t.NONE)
             {
             	//if this renderes in a main menu or something don't break it with the player being null
@@ -68,18 +70,10 @@ public class RenderItemObj extends RenderItem {
             	}
             }
             
-    		boolean fancy = this.mc.gameSettings.fancyGraphics;
-            IItemRendererHandler.isRunning = true;
-    		if(fancy)
-    		{
-    			renderer.render(itemstack, model, IItemRendererHandler.currentTransformType, this.mc.getRenderPartialTicks());
-    		}
-    		else
-    		{
-    			renderer.renderFast(itemstack, model, IItemRendererHandler.currentTransformType, this.mc.getRenderPartialTicks());
-    		}
-            IItemRendererHandler.isRunning = false;
-			
+    		IItemRendererHandler.isRunning = true;
+            IItemRendererHandler.renderIItemRenderer(renderer, itemstack, model, t, pt);
+    		IItemRendererHandler.isRunning = false;
+    		
 			GlStateManager.popMatrix();
 		}
 		else

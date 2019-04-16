@@ -262,50 +262,62 @@ public class IItemRendererHandler {
         texture.blurLast = lastBlur;
         texture.mipmapLast = lastMipmap;
 	}
-
+	
+	public static boolean enchants = false;
 	public static final ResourceLocation GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
 	/**
-	 * WIP doesnt' work yet do not use investigating color and how this can actually be applied
-	 * @param model
+	 * WIP not implemented fully yet
 	 */
 	public static void renderModelEffect(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks) 
 	{
+		if(enchants)
+			return;//prevent recursion loops
+		enchants = true;
+		Minecraft mc = instance.mc;
         GlStateManager.depthMask(false);
         GlStateManager.depthFunc(514);
         GlStateManager.disableLighting();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_COLOR, GlStateManager.DestFactor.ONE);
-        instance.mc.getTextureManager().bindTexture(GLINT);
+        mc.getTextureManager().bindTexture(GLINT);
         GlStateManager.matrixMode(5890);
         GlStateManager.pushMatrix();
         GlStateManager.scale(8.0F, 8.0F, 8.0F);
         float f = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F / 8.0F;
         GlStateManager.translate(f, 0.0F, 0.0F);
         GlStateManager.rotate(-50.0F, 0.0F, 0.0F, 1.0F);
-        
-        if(true)
-        {
-        	renderer.render(stack, model, type, partialTicks);//TODO:
-        }
-//        this.renderModel(model, -8372020);
+        renderIItemRenderer(renderer, stack, model, type, partialTicks);
         GlStateManager.popMatrix();
         GlStateManager.pushMatrix();
         GlStateManager.scale(8.0F, 8.0F, 8.0F);
         float f1 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F / 8.0F;
         GlStateManager.translate(-f1, 0.0F, 0.0F);
         GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
-        
-        if(true)
-        {
-        	renderer.render(stack, model, type, partialTicks);//TODO:
-        }
-//        this.renderModel(model, -8372020);
+        renderIItemRenderer(renderer, stack, model, type, partialTicks);
         GlStateManager.popMatrix();
         GlStateManager.matrixMode(5888);
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.enableLighting();
         GlStateManager.depthFunc(515);
         GlStateManager.depthMask(true);
-        instance.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		enchants = false;
+	}
+	
+	/**
+	 * render iitemrenderer based upon fancy or fast graphics
+	 */
+	public static void renderIItemRenderer(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks)
+	{
+		Minecraft mc = instance.mc;
+		boolean fancy = mc.gameSettings.fancyGraphics;
+		if(fancy)
+		{
+			renderer.render(stack, model, type, partialTicks);
+		}
+		else
+		{
+			renderer.renderFast(stack, model, type, partialTicks);
+		}
 	}
 
 }

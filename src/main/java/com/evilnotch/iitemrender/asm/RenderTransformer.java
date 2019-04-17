@@ -8,8 +8,11 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -32,6 +35,7 @@ public class RenderTransformer  implements IClassTransformer{
 		"net.minecraftforge.client.ForgeHooksClient",
 		"net.minecraft.client.Minecraft",
 		"net.minecraft.client.renderer.entity.RenderManager",
+		"net.minecraft.client.renderer.texture.TextureManager",
 		"mezz.jei.render.IngredientListBatchRenderer"
     });
 
@@ -67,14 +71,16 @@ public class RenderTransformer  implements IClassTransformer{
 			  break;
 			  
 			  case 3:
+				  patchTextureManager(classNode);
+			  break;
+			  
+			  case 4:
 				  JEI.patchJEI(classNode);
 		   	  break;
 			  
 			}
 	   		ClassWriter classWriter = new MCWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         	classNode.accept(classWriter);
-        	
-        	int origin = index;
         	
         	byte[] bytes = classWriter.toByteArray();
             if(ConfigCore.dumpASM)
@@ -89,6 +95,25 @@ public class RenderTransformer  implements IClassTransformer{
 			e.printStackTrace();
 			return basicClass;
 		}
+	}
+	
+	public static void patchTextureManager(ClassNode classNode) 
+	{
+		System.out.println("Patching TextureManager.class to deny binding textures when IItemRendererHandler#canBind is false");
+		MethodNode node = ASMHelper.getMethodNode(classNode, new MCPSidedString("bindTexture","func_110577_a").toString(), "(Lnet/minecraft/util/ResourceLocation;)V");
+		AbstractInsnNode start = ASMHelper.getFirstInstruction(node, Opcodes.ALOAD);
+		
+		InsnList toInsert = new InsnList();
+		toInsert.add(new MethodInsnNode(Opcodes.GETSTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "canBind", "Z", false));
+		LabelNode l1 = new LabelNode();
+		toInsert.add(new JumpInsnNode(Opcodes.IFNE, l1) );
+		LabelNode l2 = new LabelNode();
+		toInsert.add(l2);
+		toInsert.add(new InsnNode(Opcodes.RETURN));
+		toInsert.add(l1);
+		toInsert.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+		
+		node.instructions.insertBefore(start, toInsert);
 	}
 
 	public static void patchCameraTransform(ClassNode classNode) 

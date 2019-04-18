@@ -22,7 +22,12 @@
 ### Differences with forge 1.7.10 IItem Renderer
 - Rendering items with your IItemRenderer you call IItemRendererHandler.renderItem(itemstack,ibakedmodel) or just itemstack.
 - You can now override gui overlays it has a default override inside of the interface you can override for your object
-- TODO: add ablitility for users to specify if they want to allow enchantments rendering
+- Ability to render enchantments you must call it yourself in IItemRendererHandler
+
+### TODO
+- IBlockRenderer
+- Bug Fixes
+- Support for Resource Pack System 1.8+ where you can override the iitemrenderer with a static jsons model
 
 ### Demos
 https://minecraft.curseforge.com/projects/silk-spawners-forge-edition

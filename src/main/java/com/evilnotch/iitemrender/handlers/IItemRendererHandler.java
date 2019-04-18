@@ -61,14 +61,14 @@ public class IItemRendererHandler {
 	 */
 	public static final BlockPos ORIGIN = new BlockPos(0, 64, 0);
 
-	public static IItemRenderer getIItemRenderer(Item item)
+	public static IItemRenderer get(Item item)
 	{
 		return registry.get(item);
 	}
 
-	public static IItemRenderer getIItemRenderer(ItemStack itemstack)
+	public static IItemRenderer get(ItemStack itemstack)
 	{
-		return itemstack.isEmpty() ? null : getIItemRenderer(itemstack.getItem());
+		return itemstack.isEmpty() ? null : get(itemstack.getItem());
 	}
 	
 	public static Set<Item> getItems() 
@@ -79,7 +79,7 @@ public class IItemRendererHandler {
 	/**
 	 * must be called before post init
 	 */
-	public static void removeItem(Item item)
+	public static void remove(Item item)
 	{
 		registry.remove(item);
 	}
@@ -94,7 +94,7 @@ public class IItemRendererHandler {
 		return stack.isEmpty() ? false : registry.containsKey(stack.getItem());
 	}
 
-	public static void registerIItemRenderer(Item item, IItemRenderer renderer)
+	public static void register(Item item, IItemRenderer renderer)
 	{
 		registry.put(item, renderer);
 	}
@@ -276,9 +276,9 @@ public class IItemRendererHandler {
 	 * do not call this outside of your model matrix
 	 * do not bind textures in your iitemrenderer when rendering the enchantments
 	 */
-	public static void renderModelEffect(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks) 
+	public static void renderEffect(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks) 
 	{
-		renderModelEffect(renderer, stack, model, type, partialTicks, enchR, enchG, enchB);
+		renderEffect(renderer, stack, model, type, partialTicks, enchR, enchG, enchB);
 	}
 	
 	/**
@@ -286,7 +286,7 @@ public class IItemRendererHandler {
 	 * do not bind textures in your iitemrenderer when rendering the enchantments
 	 * the rgb vars are float rgb for the enchantment color overlay
 	 */
-	public static void renderModelEffect(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks, float r, float g, float b) 
+	public static void renderEffect(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks, float r, float g, float b) 
 	{
 		if(enchants)
 			return;//prevent recursion loops
@@ -328,15 +328,15 @@ public class IItemRendererHandler {
 	/**
 	 * render enchantments onto a TEISR note that this needs to get called inside of your TEISR and needs to be all one matrix in order to work properly
 	 */
-	public static void renderTEISRModelEffect(ItemStack stack) 
+	public static void renderEffectTEISR(ItemStack stack) 
 	{
-		renderTEISRModelEffect(stack, enchR, enchG, enchB);
+		renderEffectTEISR(stack, enchR, enchG, enchB);
 	}
 	
 	/**
 	 * render enchantments onto a TEISR note that this needs to get called inside of your TEISR and needs to be all one matrix in order to work properly
 	 */
-	public static void renderTEISRModelEffect(ItemStack stack, float r, float g, float b) 
+	public static void renderEffectTEISR(ItemStack stack, float r, float g, float b) 
 	{
 		if(enchants)
 			return;//prevent recursion loops

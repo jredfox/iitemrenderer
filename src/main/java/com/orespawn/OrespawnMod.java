@@ -20,7 +20,7 @@ public class OrespawnMod {
 	public void preinit(FMLPreInitializationEvent event)
 	{
 		Item item = new BasicItem(new ResourceLocation(MODID, "bertha"), CreativeTabs.REDSTONE, new LangEntry("en_us", "Bertha"));
-		IItemRendererHandler.registerIItemRenderer(item, new RenderBertha());
+		IItemRendererHandler.register(item, new RenderBertha());
 	}
 
 }

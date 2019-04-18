@@ -42,7 +42,7 @@ public class RenderItemObj extends RenderItem {
 			 IItemRendererHandler.startBlurMipmap();//make sure in recursion loops this gets set and at the end of the loop it gets set with whatever it was before
 		}
 		
-		IItemRenderer renderer = IItemRendererHandler.getIItemRenderer(itemstack);
+		IItemRenderer renderer = IItemRendererHandler.get(itemstack);
 		if(renderer != null)
 		{
 			GlStateManager.pushMatrix();
@@ -89,7 +89,7 @@ public class RenderItemObj extends RenderItem {
 	@Override
 	public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text)
 	{ 
-		IItemRenderer renderer = IItemRendererHandler.getIItemRenderer(stack);
+		IItemRenderer renderer = IItemRendererHandler.get(stack);
 		if(renderer != null)
 		{
 			IItemRendererHandler.renderOverlay(renderer, fr, stack, xPosition, yPosition, text);

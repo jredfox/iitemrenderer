@@ -19,7 +19,7 @@ public class IBlockRendererHandler {
 	
 	public static HashMap<Block,IBlockRenderer> registry = new HashMap(0);
 	
-	public static IBlockRenderer registerIBlockRenderer(Block item)
+	public static IBlockRenderer register(Block item)
 	{
 		return registry.get(item);
 	}
@@ -32,7 +32,7 @@ public class IBlockRendererHandler {
 	/**
 	 * must be called before post init
 	 */
-	public static void removeIBlockRenderer(Block block)
+	public static void remove(Block block)
 	{
 		registry.remove(block);
 	}
@@ -52,9 +52,9 @@ public class IBlockRendererHandler {
 	 * do not call this outside of your model matrix
 	 * do not bind textures in your iitemrenderer when rendering the enchantments
 	 */
-	public static void renderModelEffect(IBlockRenderer renderer, BlockPos pos, IBlockState state, int breakstage, float partialTicks) 
+	public static void renderEffect(IBlockRenderer renderer, BlockPos pos, IBlockState state, int breakstage, float partialTicks) 
 	{
-		renderModelEffect(renderer, pos, state, breakstage, partialTicks, IItemRendererHandler.enchR, IItemRendererHandler.enchG, IItemRendererHandler.enchB);
+		renderEffect(renderer, pos, state, breakstage, partialTicks, IItemRendererHandler.enchR, IItemRendererHandler.enchG, IItemRendererHandler.enchB);
 	}
 	
 	/**
@@ -62,7 +62,7 @@ public class IBlockRendererHandler {
 	 * do not bind textures in your iitemrenderer when rendering the enchantments
 	 * the rgb vars are float rgb for the enchantment color overlay
 	 */
-	public static void renderModelEffect(IBlockRenderer renderer, BlockPos pos, IBlockState state, int breakstage, float partialTicks, float r, float g, float b) 
+	public static void renderEffect(IBlockRenderer renderer, BlockPos pos, IBlockState state, int breakstage, float partialTicks, float r, float g, float b) 
 	{
 		if(IItemRendererHandler.enchants)
 			return;//prevent recursion loops
@@ -104,7 +104,7 @@ public class IBlockRendererHandler {
 	/**
 	 * render iitemrenderer based upon fancy or fast graphics
 	 */
-	public static void renderIBlockRenderer(IBlockRenderer renderer, BlockPos pos, IBlockState state, int breakStage, float partialTicks)
+	public static void render(IBlockRenderer renderer, BlockPos pos, IBlockState state, int breakStage, float partialTicks)
 	{
 		Minecraft mc = IItemRendererHandler.instance.mc;
 		boolean fancy = mc.gameSettings.fancyGraphics;

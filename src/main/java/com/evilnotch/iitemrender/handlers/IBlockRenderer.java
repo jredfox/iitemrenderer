@@ -33,7 +33,7 @@ public interface IBlockRenderer {
 	 */
 	public default void renderEffect(BlockPos pos, IBlockState state, int breakStage, float partialTicks)
 	{
-		IBlockRendererHandler.renderIBlockRenderer(this, pos, state, breakStage, partialTicks);
+		IBlockRendererHandler.renderEffect(this, pos, state, breakStage, partialTicks);
 	}
 
 }

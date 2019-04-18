@@ -43,7 +43,7 @@ public class IBlockRendererHandler {
 	}
 	
 	
-	public static void renderBlockIntoWorld(BlockPos pos, IBlockState state, IBlockAccess acess)
+	public static void renderBlock(BlockPos pos, IBlockState state, IBlockAccess acess)
 	{
 		//TODO:
 	}

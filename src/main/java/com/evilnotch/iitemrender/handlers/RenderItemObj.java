@@ -87,24 +87,16 @@ public class RenderItemObj extends RenderItem {
 	 * gets called after the iitemrenderer is rendered so holder data is auto synced
 	 */
 	@Override
-	public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack itemstack, int xPosition, int yPosition, String text)
+	public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text)
 	{ 
-		IItemRenderer renderer = IItemRendererHandler.getIItemRenderer(itemstack);
+		IItemRenderer renderer = IItemRendererHandler.getIItemRenderer(stack);
 		if(renderer != null)
 		{
-			boolean fancy = this.mc.gameSettings.fancyGraphics;
-			if(fancy)
-			{
-				renderer.renderOverlay(fr, itemstack, xPosition, yPosition, text);
-			}
-			else
-			{
-				renderer.renderOverlayFast(fr, itemstack, xPosition, yPosition, text);
-			}
+			IItemRendererHandler.renderItemOverlay(renderer, fr, stack, xPosition, yPosition, text);
 		}
 		else
 		{
-			this.child.renderItemOverlayIntoGUI(fr, itemstack, xPosition, yPosition, text);
+			this.child.renderItemOverlayIntoGUI(fr, stack, xPosition, yPosition, text);
 		}
 	}
 }

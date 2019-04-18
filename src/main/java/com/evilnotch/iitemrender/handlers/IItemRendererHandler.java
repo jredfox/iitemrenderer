@@ -392,4 +392,17 @@ public class IItemRendererHandler {
 		}
 	}
 
+	public static void renderItemOverlay(IItemRenderer renderer, FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text) 
+	{
+		boolean fancy = instance.mc.gameSettings.fancyGraphics;
+		if(fancy)
+		{
+			renderer.renderOverlay(fr, stack, xPosition, yPosition, text);
+		}
+		else
+		{
+			renderer.renderOverlayFast(fr, stack, xPosition, yPosition, text);
+		}
+	}
+
 }

@@ -17,6 +17,7 @@
 ### Usage
 - Call IItemRendererHandler.registerIItemRenderer(Item item, IItemRenderer renderer);
 - You then implement the interface you just registered
+- You can use IItemRendererHandler for rendering enchantment effects as well as access entity holder data there
 
 ### Differences with forge 1.7.10 IItem Renderer
 - Rendering items with your IItemRenderer you call IItemRendererHandler.renderItem(itemstack,ibakedmodel) or just itemstack.

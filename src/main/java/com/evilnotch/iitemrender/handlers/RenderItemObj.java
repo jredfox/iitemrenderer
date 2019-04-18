@@ -92,7 +92,7 @@ public class RenderItemObj extends RenderItem {
 		IItemRenderer renderer = IItemRendererHandler.getIItemRenderer(stack);
 		if(renderer != null)
 		{
-			IItemRendererHandler.renderItemOverlay(renderer, fr, stack, xPosition, yPosition, text);
+			IItemRendererHandler.renderOverlay(renderer, fr, stack, xPosition, yPosition, text);
 		}
 		else
 		{

@@ -15,14 +15,22 @@
 5. add the libs of to your java build path in eclipse
 
 ### Usage
-- Call IItemRendererHandler.registerIItemRenderer(Item item, IItemRenderer renderer);
-- You then implement the interface you just registered
-- You can use IItemRendererHandler for rendering enchantment effects as well as access entity holder data there
+- Call IItemRendererHandler.registerIItemRenderer()
+- For Gui Overlay Overrides override the IItemRenderer interface in your implemenation
+- Render Enchantments IItemRendererHandler.renderModelEffect()
+- Access to Entity Holder data in IItemRendererHandler
+- If your model contains random you need to cache data for enchantment support then override renderEffect() in your IItemRenderer to fully support enchantments into your dynamic random containing model
 
 ### Differences with forge 1.7.10 IItem Renderer
 - Rendering items with your IItemRenderer you call IItemRendererHandler.renderItem(itemstack,ibakedmodel) or just itemstack.
 - You can now override gui overlays it has a default override inside of the interface you can override for your object
-- TODO: add ablitility for users to specify if they want to allow enchantments rendering
+- Ability to render enchantments you must call it yourself in IItemRendererHandler
+- Ability to have a fast builtin version of your IItemRenderer for when graphics are fast
+
+### TODO
+- IBlockRenderer
+- Bug Fixes
+- Support for Resource Pack System 1.8+ where you can override the iitemrenderer with a static jsons model
 
 ### Demos
 https://minecraft.curseforge.com/projects/silk-spawners-forge-edition

@@ -71,7 +71,7 @@ public class RenderItemObj extends RenderItem {
             }
             
     		IItemRendererHandler.isRunning = true;
-            IItemRendererHandler.renderIItemRenderer(renderer, itemstack, model, t, pt);
+            IItemRendererHandler.render(renderer, itemstack, model, t, pt);
     		IItemRendererHandler.isRunning = false;
     		
 			GlStateManager.popMatrix();

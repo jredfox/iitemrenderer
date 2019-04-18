@@ -378,7 +378,7 @@ public class IItemRendererHandler {
 	/**
 	 * render iitemrenderer based upon fancy or fast graphics
 	 */
-	public static void renderIItemRenderer(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks)
+	public static void render(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks)
 	{
 		Minecraft mc = instance.mc;
 		boolean fancy = mc.gameSettings.fancyGraphics;

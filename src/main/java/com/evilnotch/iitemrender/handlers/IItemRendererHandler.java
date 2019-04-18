@@ -23,7 +23,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class IItemRendererHandler {
 
-	private static Map<Item, IItemRenderer> renderers = new HashMap<>();
+	private static Map<Item, IItemRenderer> registry = new HashMap<>();
 	public static RenderItemObj instance;
 	
 	/**
@@ -63,7 +63,7 @@ public class IItemRendererHandler {
 
 	public static IItemRenderer getIItemRenderer(Item item)
 	{
-		return renderers.get(item);
+		return registry.get(item);
 	}
 
 	public static IItemRenderer getIItemRenderer(ItemStack itemstack)
@@ -73,7 +73,7 @@ public class IItemRendererHandler {
 	
 	public static Set<Item> getItems() 
 	{
-		return renderers.keySet();
+		return registry.keySet();
 	}
 	
 	/**
@@ -81,22 +81,22 @@ public class IItemRendererHandler {
 	 */
 	public static void removeItem(Item item)
 	{
-		renderers.remove(item);
+		registry.remove(item);
 	}
 	
 	public static boolean hasKey(Item item)
 	{
-		return renderers.containsKey(item);
+		return registry.containsKey(item);
 	}
 	
 	public static boolean hasKey(ItemStack stack)
 	{
-		return stack.isEmpty() ? false : renderers.containsKey(stack.getItem());
+		return stack.isEmpty() ? false : registry.containsKey(stack.getItem());
 	}
 
 	public static void registerIItemRenderer(Item item, IItemRenderer renderer)
 	{
-		renderers.put(item, renderer);
+		registry.put(item, renderer);
 	}
 
 	public static void handleCameraTransforms(TransformType type)

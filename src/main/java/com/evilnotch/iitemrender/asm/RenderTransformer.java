@@ -8,6 +8,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
@@ -96,25 +97,6 @@ public class RenderTransformer  implements IClassTransformer{
 			return basicClass;
 		}
 	}
-	
-	public static void patchTextureManager(ClassNode classNode) 
-	{
-		System.out.println("Patching TextureManager.class to deny binding textures when IItemRendererHandler#canBind is false");
-		MethodNode node = ASMHelper.getMethodNode(classNode, new MCPSidedString("bindTexture","func_110577_a").toString(), "(Lnet/minecraft/util/ResourceLocation;)V");
-		AbstractInsnNode start = ASMHelper.getFirstInstruction(node, Opcodes.ALOAD);
-		
-		InsnList toInsert = new InsnList();
-		toInsert.add(new MethodInsnNode(Opcodes.GETSTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "canBind", "Z", false));
-		LabelNode l1 = new LabelNode();
-		toInsert.add(new JumpInsnNode(Opcodes.IFNE, l1) );
-		LabelNode l2 = new LabelNode();
-		toInsert.add(l2);
-		toInsert.add(new InsnNode(Opcodes.RETURN));
-		toInsert.add(l1);
-		toInsert.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
-		
-		node.instructions.insertBefore(start, toInsert);
-	}
 
 	public static void patchCameraTransform(ClassNode classNode) 
 	{
@@ -171,6 +153,27 @@ public class RenderTransformer  implements IClassTransformer{
 		toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "updateLastPossiblePos", "(Lnet/minecraft/entity/Entity;)V", false));
 		AbstractInsnNode point = ASMHelper.getFirstInstruction(node, Opcodes.ACONST_NULL);
 		node.instructions.insertBefore(point, toInsert);
+	}
+	
+	/**
+	 * stop the binding of textures when it is not allowed
+	 */
+	public static void patchTextureManager(ClassNode classNode) 
+	{
+		System.out.println("Patching TextureManager.class to deny binding textures when IItemRendererHandler#canBind is false");
+		MethodNode node = ASMHelper.getMethodNode(classNode, new MCPSidedString("bindTexture","func_110577_a").toString(), "(Lnet/minecraft/util/ResourceLocation;)V");
+		AbstractInsnNode start = ASMHelper.getFirstInstruction(node, Opcodes.ALOAD);
+		
+		InsnList toInsert = new InsnList();
+		toInsert.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "canBind", "Z"));
+		LabelNode l1 = new LabelNode();
+		toInsert.add(new JumpInsnNode(Opcodes.IFNE, l1) );
+		LabelNode l2 = new LabelNode();
+		toInsert.add(l2);
+		toInsert.add(new InsnNode(Opcodes.RETURN));
+		toInsert.add(l1);
+		
+		node.instructions.insertBefore(start, toInsert);
 	}
 
 }

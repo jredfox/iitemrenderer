@@ -46,13 +46,13 @@ public class RenderBertha implements IItemRenderer {
 	   {
 		   this.renderSword(6.0F, 3.0F, -5.0F, 0.25F);
 		   if(stack.hasEffect())
-			   IItemRendererHandler.renderModelEffect(this, stack, model, type, partialTicks);
+			   IItemRendererHandler.renderEffect(this, stack, model, type, partialTicks);
 	   }
 	   else if(type == type.THIRD_PERSON_RIGHT_HAND || type == type.THIRD_PERSON_LEFT_HAND)
 	   {
 		   this.renderSwordF5(-4.0F, 2.0F, -3.0F, 0.25F);
 		   if(stack.hasEffect())
-			   IItemRendererHandler.renderModelEffect(this, stack, model, type, partialTicks);
+			   IItemRendererHandler.renderEffect(this, stack, model, type, partialTicks);
 	   }
 	   else
 	   {

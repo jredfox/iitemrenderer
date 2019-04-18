@@ -73,7 +73,7 @@ public interface IItemRenderer {
 	 */
 	public default void renderEffect(ItemStack stack, IBakedModel model, TransformType type, float partialTicks)
 	{
-		IItemRendererHandler.renderIItemRenderer(this, stack, model, type, partialTicks);
+		IItemRendererHandler.render(this, stack, model, type, partialTicks);
 	}
 
 }

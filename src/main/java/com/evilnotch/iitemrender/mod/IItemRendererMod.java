@@ -15,7 +15,7 @@ public class IItemRendererMod {
 
 	public static final String MODID = "iitemrenderer";
 	public static final String NAME = "IItem Renderer";
-	public static final String VERSION = "0.9.1";
+	public static final String VERSION = "0.9.4";
 	
 	/**
 	 * add jei support to the tabs
@@ -25,10 +25,13 @@ public class IItemRendererMod {
 	{
 		if(Loader.isModLoaded("jei"))
 		{
-			for(Item i : IItemRendererHandler.getItems())
-				JEI.slowItems.add(i);
-			Class c = ReflectionUtil.classForName("mezz.jei.render.IngredientListBatchRenderer");
-			String s = c.getName();
+			Class c;
+			try {
+				c = Class.forName("mezz.jei.render.IngredientListBatchRenderer");
+				String s = c.getName();
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

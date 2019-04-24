@@ -20,11 +20,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.ForgeHooksClient;
 
 public class IItemRendererHandler {
 
 	private static Map<Item, IItemRenderer> registry = new HashMap<>();
-	public static RenderItemObj instance;
+	public static RenderItemObj renderItem;
 	
 	/**
 	 * mipmapping lastBlur before starting this rendering process
@@ -55,6 +56,16 @@ public class IItemRendererHandler {
 	 * returns true if the RenderItemObj is currently running an object
 	 */
 	public static boolean isRunning;
+	
+	/**
+	 * tell whether or not ForgeHooksClient#handleCameraTransforms() can run the open gl translates
+	 */
+	public static boolean runGLTranslates;
+	
+	/**
+	 * internal do not manipulate yourself
+	 */
+	public static boolean leftHandHackery;
 	
 	/**
 	 * it's 64 at see level rather then y of 0 so fake worlds could have a chance of simulating light if they felt like it
@@ -110,30 +121,30 @@ public class IItemRendererHandler {
 	public static void renderItemStack(ItemStack stack)
 	{
 		Minecraft mc = Minecraft.getMinecraft();
-		IBakedModel model = instance.getItemModelWithOverrides(stack, mc.world, mc.player);
+		IBakedModel model = renderItem.getItemModelWithOverrides(stack, mc.world, mc.player);
 		renderItemStack(stack, model);
 	}
 	
 	/**
-	 * use this to support asm hooks?
+	 * render an itemstack
 	 */
 	public static void renderItemStack(ItemStack stack, IBakedModel model)
 	{	
 		 if(isRunning)
 		 {
 			 GlStateManager.translate(0.5F, 0.5F, 0.5F);
-			 instance.child.renderItem(stack, model);
+			 renderItem.child.renderItem(stack, model);
 			 GlStateManager.translate(-0.5F, -0.5F, -0.5F);
 		 }
 		 else
 		 {
-			 instance.child.renderItem(stack, model);
+			 renderItem.child.renderItem(stack, model);
 		 }
 	}
 	
 	public static void renderOverlay(FontRenderer fr, ItemStack itemstack, int xPosition, int yPosition, String text) 
 	{
-		instance.child.renderItemOverlayIntoGUI(fr, itemstack, xPosition, yPosition, text);
+		renderItem.child.renderItemOverlayIntoGUI(fr, itemstack, xPosition, yPosition, text);
 	}
 	
 	/**
@@ -147,17 +158,21 @@ public class IItemRendererHandler {
 	public static void renderModel(ItemStack stack, boolean enchants)
 	{
 		Minecraft mc = Minecraft.getMinecraft();
-		IBakedModel model = getCurrentInstance().getItemModelWithOverrides(stack, mc.world, mc.player);
+		IBakedModel model = getCurrentRenderItem().getItemModelWithOverrides(stack, mc.world, mc.player);
 		renderModel(stack, model, enchants);
 	}
 	
 	/**
-	 * this only renders the model doesn't call RenderItem#renderItem(stack, model) only will cause recursion if an IItemRenderer mod is doing it wrong and starts the whole process over again
+	 * this only renders the model doesn't call RenderItem#renderItem(stack, model) and won't fire mod's custom asm data
 	 */
 	public static void renderModel(ItemStack stack, IBakedModel model, boolean enchants)
 	{	
 		//TESR support
 		GlStateManager.pushMatrix();
+		
+		GlStateManager.translate(0.5F, 0.5F, 0.5F);
+		applyGlTranslates(model);
+		GlStateManager.translate(-0.5F, -0.5F, -0.5F);
 		
 		if (model.isBuiltInRenderer())
         {
@@ -167,7 +182,7 @@ public class IItemRendererHandler {
             return;
         }
         
-		RenderItem render = getCurrentInstance();
+		RenderItem render = getCurrentRenderItem();
 		render.renderModel(model, stack);
 
         if(enchants && stack.hasEffect())
@@ -182,7 +197,7 @@ public class IItemRendererHandler {
 	 * may or may not be equal to IItemRendererHandler#instance
 	 * @return
 	 */
-	public static RenderItem getCurrentInstance()
+	public static RenderItem getCurrentRenderItem()
 	{
 		return Minecraft.getMinecraft().renderItem;
 	}
@@ -213,8 +228,8 @@ public class IItemRendererHandler {
 	{
 		if(!isRunning)
 		{
-			instance.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-			AbstractTexture texture = (AbstractTexture) instance.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			renderItem.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			AbstractTexture texture = (AbstractTexture) renderItem.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 			lastBlur = texture.blurLast;
 			lastMipmap = texture.mipmapLast;
 		}
@@ -264,13 +279,22 @@ public class IItemRendererHandler {
         texture.blurLast = lastBlur;
         texture.mipmapLast = lastMipmap;
 	}
-	
+	/**
+	 * is it currently rendering an iitemrenderer enchantment
+	 */
 	public static boolean enchants = false;
 	public static final ResourceLocation GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
 	public static float enchR = 0.5019608F;
 	public static float enchG = 0.2509804F;
 	public static float enchB = 0.8F;
+	/**
+	 * tell mc if you canBind textures or not
+	 */
 	public static boolean canBind = true;
+	/**
+	 * disable this for rendering an IBakedModel and it won't render the effect then re-enable it
+	 */
+	public static boolean allowEnchants = true;
 	
 	/**
 	 * do not call this outside of your model matrix
@@ -289,11 +313,11 @@ public class IItemRendererHandler {
 	public static void renderEffect(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks, float r, float g, float b) 
 	{
 		if(enchants)
-			return;//prevent recursion loops
+			return;//prevent recursion loops or return if it's disabled
 		
 		enchants = true;
         GlStateManager.color(r, g, b);
-		Minecraft mc = instance.mc;
+		Minecraft mc = renderItem.mc;
         GlStateManager.depthMask(false);
         GlStateManager.depthFunc(514);
         GlStateManager.disableLighting();
@@ -343,7 +367,7 @@ public class IItemRendererHandler {
 		
 		enchants = true;
         GlStateManager.color(r, g, b);
-		Minecraft mc = instance.mc;
+		Minecraft mc = renderItem.mc;
         GlStateManager.depthMask(false);
         GlStateManager.depthFunc(514);
         GlStateManager.disableLighting();
@@ -380,7 +404,7 @@ public class IItemRendererHandler {
 	 */
 	public static void render(IItemRenderer renderer, ItemStack stack, IBakedModel model, TransformType type, float partialTicks)
 	{
-		Minecraft mc = instance.mc;
+		Minecraft mc = renderItem.mc;
 		boolean fancy = mc.gameSettings.fancyGraphics;
 		if(fancy)
 		{
@@ -394,7 +418,7 @@ public class IItemRendererHandler {
 
 	public static void renderOverlay(IItemRenderer renderer, FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text) 
 	{
-		boolean fancy = instance.mc.gameSettings.fancyGraphics;
+		boolean fancy = renderItem.mc.gameSettings.fancyGraphics;
 		if(fancy)
 		{
 			renderer.renderOverlay(fr, stack, xPosition, yPosition, text);
@@ -403,6 +427,16 @@ public class IItemRendererHandler {
 		{
 			renderer.renderOverlayFast(fr, stack, xPosition, yPosition, text);
 		}
+	}
+	
+	/**
+	 * apply the gl translates vertex data here from an IBakedModel so your post rendering logic will work
+	 */
+	public static void applyGlTranslates(IBakedModel model) 
+	{
+		IItemRendererHandler.runGLTranslates = true;
+		ForgeHooksClient.handleCameraTransforms(model, IItemRendererHandler.currentTransformType, IItemRendererHandler.leftHandHackery);
+		IItemRendererHandler.runGLTranslates = false;
 	}
 
 }

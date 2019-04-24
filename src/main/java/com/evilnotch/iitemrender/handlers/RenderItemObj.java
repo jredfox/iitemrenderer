@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
@@ -27,9 +28,9 @@ public class RenderItemObj extends RenderItem {
 		super(Minecraft.getMinecraft().getTextureManager(), renderItem.getItemModelMesher().getModelManager(), Minecraft.getMinecraft().getItemColors());
 		this.child = renderItem;
 		this.mc = Minecraft.getMinecraft();
-		if(IItemRendererHandler.instance == null)
+		if(IItemRendererHandler.renderItem == null)
 		{
-			IItemRendererHandler.instance = this;
+			IItemRendererHandler.renderItem = this;
 		}
 	}
 

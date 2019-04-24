@@ -5,6 +5,8 @@ import static org.objectweb.asm.Opcodes.ALOAD;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -18,12 +20,11 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import com.evilnotch.lib.api.mcp.MCPSidedString;
 import com.evilnotch.lib.asm.util.ASMHelper;
+import com.evilnotch.lib.util.JavaUtil;
 
 import net.minecraft.item.Item;
 
 public class JEI {
-	
-	public static Set<Item> slowItems = new HashSet();
 	
 	public static void patchJEI(ClassNode classNode)
 	{
@@ -51,15 +52,16 @@ public class JEI {
 				}
 			}
 		}
-	
+
+		
+		//append && JavaUtil.returnFalse() to jei patcher so jei always renders RenderItem#renderItem()
 		JumpInsnNode spotting = (JumpInsnNode)spot;
 		int varLoad = ASMHelper.getLocalVarIndexFromOwner(method,"Lnet/minecraft/item/ItemStack;");
+		
 		InsnList toInsert = new InsnList();
-		toInsert.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/evilnotch/iitemrender/asm/compat/JEI", "slowItems", "Ljava/util/Set;"));
-		toInsert.add(new VarInsnNode(ALOAD,varLoad));
-   		toInsert.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL,"net/minecraft/item/ItemStack", new MCPSidedString("getItem","func_77973_b").toString(), "()Lnet/minecraft/item/Item;", false));
-   		toInsert.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE,"java/util/Set", "contains", "(Ljava/lang/Object;)Z", true));
-   		toInsert.add(new JumpInsnNode(Opcodes.IFNE,spotting.label));
-   		method.instructions.insert(spotting,toInsert);
+	    toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/lib/util/JavaUtil", "returnFalse", "()Z", false));
+	    toInsert.add(new JumpInsnNode(Opcodes.IFEQ, spotting.label));
+	    
+   		method.instructions.insert(spotting, toInsert);
 	}
 }

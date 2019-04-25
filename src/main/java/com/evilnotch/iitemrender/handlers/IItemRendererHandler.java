@@ -6,6 +6,8 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import com.evilnotch.iitemrender.handlers.IItemRenderer.TransformPreset;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -116,7 +118,7 @@ public class IItemRendererHandler {
 	}
 	
 	/**
-	 * warning not in it's own matrix. use this to render vanilla models that won't fire IItemRenderer's
+	 * render a vanilla itemstack
 	 */
 	public static void renderItemStack(ItemStack stack)
 	{
@@ -126,71 +128,36 @@ public class IItemRendererHandler {
 	}
 	
 	/**
-	 * render an itemstack
+	 * render a vanilla itemstack
 	 */
 	public static void renderItemStack(ItemStack stack, IBakedModel model)
+	{
+		renderItemStack(stack, model, true);
+	}
+	
+	/**
+	 * render a vanilla itemstack
+	 */
+	public static void renderItemStack(ItemStack stack, IBakedModel model, boolean allowEnch)
 	{	
-		 if(isRunning)
-		 {
-			 GlStateManager.translate(0.5F, 0.5F, 0.5F);
-			 renderItem.child.renderItem(stack, model);
-			 GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-		 }
-		 else
-		 {
-			 renderItem.child.renderItem(stack, model);
-		 }
+		boolean cachedEnch = allowEnchants;
+		allowEnchants = allowEnch;//if false disables enchantments for vanilla IBakedModels
+		if(isRunning)
+		{
+			GlStateManager.translate(0.5F, 0.5F, 0.5F);
+		 	renderItem.child.renderItem(stack, model);
+		 	GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+		}
+		else
+		{
+			renderItem.child.renderItem(stack, model);
+		}
+		allowEnchants = cachedEnch;
 	}
 	
 	public static void renderOverlay(FontRenderer fr, ItemStack itemstack, int xPosition, int yPosition, String text) 
 	{
 		renderItem.child.renderItemOverlayIntoGUI(fr, itemstack, xPosition, yPosition, text);
-	}
-	
-	/**
-	 * this only renders the model doesn't call RenderItem#renderItem(stack, model) only will cause recursion if an IItemRenderer mod is doing it wrong and starts the whole process over again
-	 */
-	public static void renderModel(ItemStack stack)
-	{
-		renderModel(stack, true);
-	}
-	
-	public static void renderModel(ItemStack stack, boolean enchants)
-	{
-		Minecraft mc = Minecraft.getMinecraft();
-		IBakedModel model = getCurrentRenderItem().getItemModelWithOverrides(stack, mc.world, mc.player);
-		renderModel(stack, model, enchants);
-	}
-	
-	/**
-	 * this only renders the model doesn't call RenderItem#renderItem(stack, model) and won't fire mod's custom asm data
-	 */
-	public static void renderModel(ItemStack stack, IBakedModel model, boolean enchants)
-	{	
-		//TESR support
-		GlStateManager.pushMatrix();
-		
-		GlStateManager.translate(0.5F, 0.5F, 0.5F);
-		applyGlTranslates(model);
-		GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-		
-		if (model.isBuiltInRenderer())
-        {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            GlStateManager.enableRescaleNormal();
-            stack.getItem().getTileEntityItemStackRenderer().renderByItem(stack);
-            return;
-        }
-        
-		RenderItem render = getCurrentRenderItem();
-		render.renderModel(model, stack);
-
-        if(enchants && stack.hasEffect())
-        {
-        	render.renderEffect(model);
-        }
-        
-        GlStateManager.popMatrix();
 	}
 	
 	/**
@@ -279,6 +246,7 @@ public class IItemRendererHandler {
         texture.blurLast = lastBlur;
         texture.mipmapLast = lastMipmap;
 	}
+	
 	/**
 	 * is it currently rendering an iitemrenderer enchantment
 	 */
@@ -430,13 +398,87 @@ public class IItemRendererHandler {
 	}
 	
 	/**
-	 * apply the gl translates vertex data here from an IBakedModel so your post rendering logic will work
+	 * apply the vanilla gl translates/scaling/rotations data here from an IBakedModel so your post rendering logic will work
 	 */
-	public static void applyGlTranslates(IBakedModel model) 
+	public static void applyTransforms(IBakedModel model) 
 	{
 		IItemRendererHandler.runGLTranslates = true;
 		ForgeHooksClient.handleCameraTransforms(model, IItemRendererHandler.currentTransformType, IItemRendererHandler.leftHandHackery);
 		IItemRendererHandler.runGLTranslates = false;
+	}
+	
+	/**
+	 * apply the transforms per iitemrenderer
+	 */
+	public static void applyTransforms(IItemRenderer renderer, IBakedModel vanilla) 
+	{
+		TransformPreset preset = renderer.getTransformPreset();
+		if(preset == TransformPreset.NONE)
+		{
+			return;
+		}
+		else if(preset == TransformPreset.MODEL)
+		{
+			applyTransforms(vanilla);
+		}
+		else if(preset == TransformPreset.FIXED)
+		{
+			applyLegacyTransforms(currentTransformType);
+		}
+	}
+
+	public static void applyLegacyTransforms(TransformType type)
+	{
+		// TODO Auto-generated method stub
+	}
+	
+	public static boolean isThirdPerson(TransformType type)
+	{
+		return type == type.THIRD_PERSON_RIGHT_HAND || type == type.THIRD_PERSON_LEFT_HAND;
+	}
+	
+	public static boolean isFirstPerson(TransformType type)
+	{
+		return type == type.FIRST_PERSON_RIGHT_HAND || type == type.FIRST_PERSON_LEFT_HAND;
+	}
+	
+	public static boolean isGui(TransformType type)
+	{
+		return type == type.GUI;
+	}
+	
+	public static boolean isEntityItem(TransformType type)
+	{
+		return type == type.GROUND;
+	}
+	
+	public static boolean isItemFrame(TransformType type)
+	{
+		return type == type.FIXED;
+	}
+	
+	public static boolean isUnkown(TransformType type)
+	{
+		return type == type.NONE;
+	}
+	
+	/**
+	 * update last pos when entity holder data is null/player but, still renders
+	 */
+	public static void updateLastPos(TransformType t)
+	{
+        if(IItemRendererHandler.isGui(t) || IItemRendererHandler.isFirstPerson(t) || IItemRendererHandler.isUnkown(t))
+        {
+        	//if this renderes in a main menu or something don't break it with the player being null
+        	if(renderItem.mc.player != null)
+        	{
+        		IItemRendererHandler.updateLastPossiblePos(renderItem.mc.player);//we don't know if this is calling it recursively so don't assume that it's not running
+        	}
+        	else
+        	{
+        		IItemRendererHandler.updateLastPossiblePos(IItemRendererHandler.ORIGIN);//we don't know if this is calling it recursively so don't assume that it's not running
+        	}
+        }
 	}
 
 }

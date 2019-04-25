@@ -52,7 +52,6 @@ public class JEI {
 				}
 			}
 		}
-
 		
 		//append && JavaUtil.returnFalse() to jei patcher so jei always renders RenderItem#renderItem()
 		JumpInsnNode spotting = (JumpInsnNode)spot;

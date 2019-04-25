@@ -48,6 +48,8 @@ public class RenderItemObj extends RenderItem {
 		{
 			GlStateManager.pushMatrix();
 			
+			IItemRendererHandler.applyTransforms(renderer, model);
+			
             GlStateManager.enableLighting();//enable this for 3d rendering
             GlStateManager.translate(-0.5F, -0.5F, -0.5F); //setup so the item starts rendering in the top left corner
             
@@ -57,19 +59,7 @@ public class RenderItemObj extends RenderItem {
   
             TransformType t = IItemRendererHandler.currentTransformType;
             float pt = this.mc.getRenderPartialTicks();
-            
-            if(t == t.GUI || t == t.FIRST_PERSON_RIGHT_HAND  || t == t.FIRST_PERSON_LEFT_HAND || t == t.NONE)
-            {
-            	//if this renderes in a main menu or something don't break it with the player being null
-            	if(this.mc.player != null)
-            	{
-            		IItemRendererHandler.updateLastPossiblePos(this.mc.player);//we don't know if this is calling it recursively so don't assume that it's not running
-            	}
-            	else
-            	{
-            		IItemRendererHandler.updateLastPossiblePos(IItemRendererHandler.ORIGIN);//we don't know if this is calling it recursively so don't assume that it's not running
-            	}
-            }
+            IItemRendererHandler.updateLastPos(t);
             
     		IItemRendererHandler.isRunning = true;
             IItemRendererHandler.render(renderer, itemstack, model, t, pt);

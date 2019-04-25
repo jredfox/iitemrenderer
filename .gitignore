@@ -14,3 +14,4 @@
 #Don't ignore license
 !LICENCE
 !README.md
+src/main/java/net/minecraft/client/renderer/entity/layers/LayerHeldItem.java

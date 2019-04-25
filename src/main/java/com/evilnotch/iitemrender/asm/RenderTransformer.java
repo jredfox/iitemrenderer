@@ -106,12 +106,13 @@ public class RenderTransformer  implements IClassTransformer{
 	public static void patchRenderItem(ClassNode classNode) 
 	{	
 		//add IItemRendererHandler.applyGlTranslates(model) to RenderItem#renderItem
+		System.out.println("patching RenderItem.class");
 		MethodNode renderItem = ASMHelper.getMethodNode(classNode, new MCPSidedString("renderItem", "func_180454_a").toString(), "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/block/model/IBakedModel;)V");
-		AbstractInsnNode spotRenderItem = ASMHelper.getMethodInsnNode(renderItem, Opcodes.INVOKESTATIC, "net/minecraft/client/renderer/GlStateManager", "pushMatrix", "()V", false);
+		AbstractInsnNode spotRenderItem = ASMHelper.getMethodInsnNode(renderItem, Opcodes.INVOKESTATIC, "net/minecraft/client/renderer/GlStateManager", new MCPSidedString("pushMatrix", "func_179094_E").toString(), "()V", false);
 		
 		InsnList toInsert = new InsnList();
 		toInsert.add(new VarInsnNode(ALOAD, 2));
-		toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "applyGlTranslates", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;)V", false));
+		toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "applyTransforms", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;)V", false));
 		
 		renderItem.instructions.insert(spotRenderItem, toInsert);
 		
@@ -163,7 +164,7 @@ public class RenderTransformer  implements IClassTransformer{
 	public static void patchMinecraft(ClassNode classNode) 
 	{
 		  System.out.println("patching Minecraft.class for custom RenderItem");
-		  MethodNode method = ASMHelper.getMethodNode(classNode, new MCPSidedString("init","func_71384_a").toString(), "()V");
+		  MethodNode method = ASMHelper.getMethodNode(classNode, new MCPSidedString("init", "func_71384_a").toString(), "()V");
 		  AbstractInsnNode start = null;
 		  AbstractInsnNode end = null;
 		  

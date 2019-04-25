@@ -3,6 +3,7 @@ package com.evilnotch.iitemrender.handlers;
 import javax.annotation.Nullable;
 
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
@@ -35,6 +36,19 @@ public interface IItemRenderer {
 	 * @param partialTicks allows partialTicks to interpolate for animations usually the same as Minecraft.getMinecraft().getPartialTicks() unless someone manually renders your renderer
 	 */
 	public void render(ItemStack itemstack, IBakedModel model, TransformType type, float partialTicks);
+	
+	/**
+	 * return what type of preset open gl transformations will occur
+	 * @TYPE MODEL vanilla IBakedModel transformations onto your entire gl matrix
+	 * @TYPE FIXED 1.7.10 fixed transforms ported
+	 * @TYPE NONE no transforms done besdies GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+	 */
+	public TransformPreset getTransformPreset();
+	
+	/**
+	 * does your iitemrenderer support resource pack overrides. if it's a hook like silkspawners return false but, if it's like just a model like orespawn big bertha return true
+	 */
+//	public boolean allowRPOverride(ItemStack itemstack, IBakedModel model, TransformType type);
 	
 	/**
 	 * the faster render for your renderer
@@ -74,6 +88,13 @@ public interface IItemRenderer {
 	public default void renderEffect(ItemStack stack, IBakedModel model, TransformType type, float partialTicks)
 	{
 		IItemRendererHandler.render(this, stack, model, type, partialTicks);
+	}
+	
+	public static enum TransformPreset
+	{
+		MODEL(),
+		FIXED(),
+		NONE();
 	}
 
 }

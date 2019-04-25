@@ -50,6 +50,9 @@ public class RenderBertha implements IItemRenderer {
 	   }
 	   else if(type == type.THIRD_PERSON_RIGHT_HAND || type == type.THIRD_PERSON_LEFT_HAND)
 	   {
+		   this.presets();
+//	       IItemRendererHandler.applyTransforms(model);
+	       
 		   this.renderSwordF5(-4.0F, 2.0F, -3.0F, 0.25F);
 		   if(stack.hasEffect())
 			   IItemRendererHandler.renderEffect(this, stack, model, type, partialTicks);
@@ -58,6 +61,23 @@ public class RenderBertha implements IItemRenderer {
 	   {
 		   IItemRendererHandler.renderItemStack(stack);
 	   }
-	   
    }
+   
+   private void presets() 
+   {
+	   GlStateManager.translate(-0.0625F, 0.4375F, 0.0625F);
+	   
+	   float f2 = 0.5F;
+	   GlStateManager.translate(0.0F, 0.1875F, -0.3125F);
+       f2 *= 0.75F;
+       GlStateManager.rotate(20.0F, 1.0F, 0.0F, 0.0F);
+       GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
+       GlStateManager.scale(-f2, -f2, f2);
+   }
+
+    @Override
+	public TransformPreset getTransformPreset() 
+    {
+		return TransformPreset.FIXED;
+	}
 }

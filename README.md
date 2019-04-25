@@ -15,11 +15,12 @@
 5. add the libs of to your java build path in eclipse
 
 ### Usage
-- Call IItemRendererHandler.registerIItemRenderer()
-- For Gui Overlay Overrides override the IItemRenderer interface in your implemenation
+- Register using IItemRendererHandler.registerIItemRenderer()
+- For custom overlays override IItemRenderer#renderOverlay
+- For faster rendering without fancy graphics override fast methods inside of IItemRenderer
 - Render Enchantments IItemRendererHandler.renderModelEffect()
-- Access to Entity Holder data in IItemRendererHandler
-- If your model contains random you need to cache data for enchantment support then override renderEffect() in your IItemRenderer to fully support enchantments into your dynamic random containing model
+- Access Entity Holder data in IItemRendererHandler
+- If your model contains random you need to cache data for enchantment support then override renderEffect() in your IItemRenderer to fully support enchantments into your dynamic random containing mode
 
 ### Differences with forge 1.7.10 IItem Renderer
 - Rendering items with your IItemRenderer you call IItemRendererHandler.renderItem(itemstack,ibakedmodel) or just itemstack.

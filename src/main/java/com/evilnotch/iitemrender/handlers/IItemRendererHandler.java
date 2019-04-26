@@ -61,9 +61,9 @@ public class IItemRendererHandler {
 	public static boolean isRunning;
 	
 	/**
-	 * tell whether or not ForgeHooksClient#handleCameraTransforms() can run the open gl translates
+	 * tell whether or not ForgeHooksClient#handleCameraTransforms() can run the open gl transforms(scaling,translates,rotations)
 	 */
-	public static boolean runGLTranslates;
+	public static boolean runTransforms;
 	
 	/**
 	 * internal do not manipulate yourself
@@ -133,13 +133,13 @@ public class IItemRendererHandler {
 	 */
 	public static void renderItemStack(ItemStack stack, IBakedModel model)
 	{
-		renderItemStack(stack, model, true, true);
+		renderItemStack(stack, model, true);
 	}
 	
 	/**
 	 * render a vanilla itemstack
 	 */
-	public static void renderItemStack(ItemStack stack, IBakedModel model, boolean allowEnch, boolean applyTransforms)
+	public static void renderItemStack(ItemStack stack, IBakedModel model, boolean allowEnch)
 	{	
 		boolean cachedEnch = allowEnchants;
 		allowEnchants = allowEnch;//if false disables enchantments for vanilla IBakedModels
@@ -233,6 +233,25 @@ public class IItemRendererHandler {
 		lastPitch = 0.0F;
 		lastYawHead = 0.0F;
 		lastEntity = null;
+	}
+	
+	/**
+	 * update last pos when entity holder data is null/player but, still renders
+	 */
+	public static void updateLastPos(TransformType t)
+	{
+        if(IItemRendererHandler.isGui(t) || IItemRendererHandler.isFirstPerson(t) || IItemRendererHandler.isUnkown(t))
+        {
+        	//if this renderes in a main menu or something don't break it with the player being null
+        	if(renderItem.mc.player != null)
+        	{
+        		IItemRendererHandler.updateLastPossiblePos(renderItem.mc.player);//we don't know if this is calling it recursively so don't assume that it's not running
+        	}
+        	else
+        	{
+        		IItemRendererHandler.updateLastPossiblePos(IItemRendererHandler.ORIGIN);//we don't know if this is calling it recursively so don't assume that it's not running
+        	}
+        }
 	}
 	
 	public static void startBlurMipmap()
@@ -408,9 +427,9 @@ public class IItemRendererHandler {
 	 */
 	public static void applyTransforms(IBakedModel model) 
 	{
-		IItemRendererHandler.runGLTranslates = true;
+		IItemRendererHandler.runTransforms = true;
 		ForgeHooksClient.handleCameraTransforms(model, IItemRendererHandler.currentTransformType, IItemRendererHandler.leftHandHackery);
-		IItemRendererHandler.runGLTranslates = false;
+		IItemRendererHandler.runTransforms = false;
 	}
 	
 	/**
@@ -485,24 +504,9 @@ public class IItemRendererHandler {
 	{
 		return type == type.NONE;
 	}
-	
-	/**
-	 * update last pos when entity holder data is null/player but, still renders
-	 */
-	public static void updateLastPos(TransformType t)
-	{
-        if(IItemRendererHandler.isGui(t) || IItemRendererHandler.isFirstPerson(t) || IItemRendererHandler.isUnkown(t))
-        {
-        	//if this renderes in a main menu or something don't break it with the player being null
-        	if(renderItem.mc.player != null)
-        	{
-        		IItemRendererHandler.updateLastPossiblePos(renderItem.mc.player);//we don't know if this is calling it recursively so don't assume that it's not running
-        	}
-        	else
-        	{
-        		IItemRendererHandler.updateLastPossiblePos(IItemRendererHandler.ORIGIN);//we don't know if this is calling it recursively so don't assume that it's not running
-        	}
-        }
-	}
 
+	public static boolean isHead(TransformType type)
+	{
+		return type == type.HEAD;
+	}
 }

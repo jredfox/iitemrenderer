@@ -154,7 +154,7 @@ public class RenderTransformer  implements IClassTransformer{
 	      }
 	      
 	      InsnList toInsert2 = new InsnList();
-	      toInsert2.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "runGLTranslates", "Z"));
+	      toInsert2.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "runTransforms", "Z"));
 	      toInsert2.add(new JumpInsnNode(Opcodes.IFEQ, spotIf.label));
 	      camera.instructions.insert(spotIf, toInsert2);
 	}

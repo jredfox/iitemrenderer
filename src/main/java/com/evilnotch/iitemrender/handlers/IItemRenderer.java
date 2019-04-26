@@ -39,9 +39,8 @@ public interface IItemRenderer {
 	
 	/**
 	 * return what type of preset open gl transformations will occur
-	 * @TYPE MODEL vanilla IBakedModel transformations onto your entire gl matrix
 	 * @TYPE FIXED 1.7.10 fixed transforms ported
-	 * @TYPE NONE no transforms done besdies GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+	 * @TYPE NONE no transforms done besides GlStateManager.translate(-0.5F, -0.5F, -0.5F);
 	 */
 	public TransformPreset getTransformPreset();
 	

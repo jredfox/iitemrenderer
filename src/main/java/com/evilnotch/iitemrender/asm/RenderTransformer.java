@@ -9,7 +9,6 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -19,11 +18,11 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.evilnotch.classwriter.MCWriter;
 import com.evilnotch.iitemrender.asm.compat.JEI;
 import com.evilnotch.lib.api.mcp.MCPSidedString;
 import com.evilnotch.lib.asm.ConfigCore;
 import com.evilnotch.lib.asm.FMLCorePlugin;
+import com.evilnotch.lib.asm.classwriter.MCWriter;
 import com.evilnotch.lib.asm.util.ASMHelper;
 import com.evilnotch.lib.util.JavaUtil;
 
@@ -107,14 +106,13 @@ public class RenderTransformer  implements IClassTransformer{
 	{	
 		//add IItemRendererHandler.applyGlTranslates(model) to RenderItem#renderItem
 		System.out.println("patching RenderItem.class");
-		MethodNode renderItem = ASMHelper.getMethodNode(classNode, new MCPSidedString("renderItem", "func_180454_a").toString(), "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/block/model/IBakedModel;)V");
-		AbstractInsnNode spotRenderItem = ASMHelper.getMethodInsnNode(renderItem, Opcodes.INVOKESTATIC, "net/minecraft/client/renderer/GlStateManager", new MCPSidedString("pushMatrix", "func_179094_E").toString(), "()V", false);
 		
-		InsnList toInsert = new InsnList();
-		toInsert.add(new VarInsnNode(ALOAD, 2));
-		toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "applyTransforms", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;)V", false));
-		
-		renderItem.instructions.insert(spotRenderItem, toInsert);
+//		MethodNode renderItem = ASMHelper.getMethodNode(classNode, new MCPSidedString("renderItem", "func_180454_a").toString(), "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/block/model/IBakedModel;)V");
+//		AbstractInsnNode spotRenderItem = ASMHelper.getMethodInsnNode(renderItem, Opcodes.INVOKESTATIC, "net/minecraft/client/renderer/GlStateManager", new MCPSidedString("pushMatrix", "func_179094_E").toString(), "()V", false);
+//		InsnList toInsert = new InsnList();
+//		toInsert.add(new VarInsnNode(ALOAD, 2));
+//		toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "applyTransforms", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;)V", false));
+//		renderItem.instructions.insert(spotRenderItem, toInsert);
 		
 		//disable enchantment effects
 		MethodNode effects = ASMHelper.getMethodNode(classNode, new MCPSidedString("renderEffect", "func_191966_a").toString(), "(Lnet/minecraft/client/renderer/block/model/IBakedModel;)V");

@@ -69,7 +69,10 @@ public class RenderItemObj extends RenderItem {
 		}
 		else
 		{
+			GlStateManager.pushMatrix();
+			IItemRendererHandler.applyTransforms(model);
 			this.child.renderItem(itemstack, model);
+			GlStateManager.popMatrix();
 		}
 	}
 	

@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
+import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -132,26 +133,30 @@ public class IItemRendererHandler {
 	 */
 	public static void renderItemStack(ItemStack stack, IBakedModel model)
 	{
-		renderItemStack(stack, model, true);
+		renderItemStack(stack, model, true, true);
 	}
 	
 	/**
 	 * render a vanilla itemstack
 	 */
-	public static void renderItemStack(ItemStack stack, IBakedModel model, boolean allowEnch)
+	public static void renderItemStack(ItemStack stack, IBakedModel model, boolean allowEnch, boolean applyTransforms)
 	{	
 		boolean cachedEnch = allowEnchants;
 		allowEnchants = allowEnch;//if false disables enchantments for vanilla IBakedModels
+		GlStateManager.pushMatrix();
 		if(isRunning)
 		{
-			GlStateManager.translate(0.5F, 0.5F, 0.5F);
+			translateDefault(false);
+			applyTransforms(model);
 		 	renderItem.child.renderItem(stack, model);
-		 	GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+		 	translateDefault(true);
 		}
 		else
 		{
+			applyTransforms(model);
 			renderItem.child.renderItem(stack, model);
 		}
+		GlStateManager.popMatrix();
 		allowEnchants = cachedEnch;
 	}
 	
@@ -399,6 +404,7 @@ public class IItemRendererHandler {
 	
 	/**
 	 * apply the vanilla gl translates/scaling/rotations data here from an IBakedModel so your post rendering logic will work
+	 * do not call this directly from an iitemrenderer without gl translating 0.5F+
 	 */
 	public static void applyTransforms(IBakedModel model) 
 	{
@@ -408,6 +414,28 @@ public class IItemRendererHandler {
 	}
 	
 	/**
+	 * if you want your iitemrenderer to conform to transforms of the IBakedModel call this
+	 */
+	public static void applyTransformPreset(IBakedModel model)
+	{
+		translateDefault(false);
+		applyTransforms(model);
+		translateDefault(true);
+	}
+	
+	public static void translateDefault(boolean negative)
+	{
+		if(negative)
+		{
+			GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+		}
+		else
+		{
+			GlStateManager.translate(0.5F, 0.5F, 0.5F);
+		}
+	}
+
+	/**
 	 * apply the transforms per iitemrenderer
 	 */
 	public static void applyTransforms(IItemRenderer renderer, IBakedModel vanilla) 
@@ -416,10 +444,6 @@ public class IItemRendererHandler {
 		if(preset == TransformPreset.NONE)
 		{
 			return;
-		}
-		else if(preset == TransformPreset.MODEL)
-		{
-			applyTransforms(vanilla);
 		}
 		else if(preset == TransformPreset.FIXED)
 		{

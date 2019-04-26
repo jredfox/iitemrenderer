@@ -92,7 +92,6 @@ public interface IItemRenderer {
 	
 	public static enum TransformPreset
 	{
-		MODEL(),
 		FIXED(),
 		NONE();
 	}

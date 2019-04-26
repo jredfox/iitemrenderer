@@ -8,8 +8,8 @@
 
 ### Installation
 1. Download Source
-2. Download Evil Notch Lib srg/deob jar and do the same with MC ClassWriter Mod
-3. Throw these jars in your libs folder.
+2. Download Evil Notch Lib srg/deob jar
+3. Throw the jar into your libs folder.
 3. add "useDepAts = true" under the minecraft section in your build.gradle
 4. run gradlew setupDecompWorkspace eclipse
 5. add the libs of to your java build path in eclipse

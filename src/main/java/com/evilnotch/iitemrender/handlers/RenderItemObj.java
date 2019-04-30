@@ -93,4 +93,12 @@ public class RenderItemObj extends RenderItem {
 			this.child.renderItemOverlayIntoGUI(fr, stack, xPosition, yPosition, text);
 		}
 	}
+	
+	@Override
+	public boolean shouldRenderItemIn3D(ItemStack stack)
+	{
+		if(IItemRendererHandler.hasKey(stack))
+			return true;
+		return super.shouldRenderItemIn3D(stack);
+	}
 }

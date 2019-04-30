@@ -6,6 +6,8 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.lwjgl.opengl.GL11;
+
 import com.evilnotch.iitemrender.handlers.IItemRenderer.TransformPreset;
 
 import net.minecraft.client.Minecraft;
@@ -472,7 +474,7 @@ public class IItemRendererHandler {
 
 	public static void applyLegacyTransforms(TransformType type)
 	{
-		// TODO Auto-generated method stub
+		//TODO:
 	}
 	
 	public static boolean isThirdPerson(TransformType type)

@@ -487,9 +487,12 @@ public class IItemRendererHandler {
 		return type == type.FIRST_PERSON_RIGHT_HAND || type == type.FIRST_PERSON_LEFT_HAND;
 	}
 	
+	/**
+	 * type none is most likely a gui or gui like thing so both gui and none type return true
+	 */
 	public static boolean isGui(TransformType type)
 	{
-		return type == type.GUI;
+		return type == type.GUI || type == type.NONE;
 	}
 	
 	public static boolean isEntityItem(TransformType type)

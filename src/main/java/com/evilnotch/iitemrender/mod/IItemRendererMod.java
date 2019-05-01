@@ -1,10 +1,5 @@
 package com.evilnotch.iitemrender.mod;
 
-import com.evilnotch.iitemrender.asm.compat.JEI;
-import com.evilnotch.iitemrender.handlers.IItemRendererHandler;
-import com.evilnotch.lib.api.ReflectionUtil;
-
-import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;

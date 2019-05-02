@@ -56,6 +56,9 @@ public class RenderItemObj extends RenderItem {
             //enable these for TEISR like rendering
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.enableRescaleNormal();
+            
+            //new code I find nessary for this to work
+            GlStateManager.depthMask(true);//set depth mask to true in case vanilla decides hey it's an ice block enable depth mask
   
             TransformType t = IItemRendererHandler.currentTransformType;
             float pt = this.mc.getRenderPartialTicks();

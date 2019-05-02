@@ -4,25 +4,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
-import org.lwjgl.opengl.GL11;
-
 import com.evilnotch.iitemrender.handlers.IItemRenderer.TransformPreset;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockMobSpawner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -112,7 +110,15 @@ public class IItemRendererHandler {
 
 	public static void register(Item item, IItemRenderer renderer)
 	{
+		if(item == Items.AIR)
+			throw new IllegalArgumentException("Item/Block cannot be AIR");
 		registry.put(item, renderer);
+	}
+	
+	public static void register(Block block, IItemRenderer renderer)
+	{
+		Item item = Item.getItemFromBlock(block);
+		register(item, renderer);
 	}
 
 	public static void handleCameraTransforms(TransformType type)
@@ -140,12 +146,21 @@ public class IItemRendererHandler {
 	
 	/**
 	 * render a vanilla itemstack
+	 * WARNING this can make the depthMask(true) again use with caution
 	 */
 	public static void renderItemStack(ItemStack stack, IBakedModel model, boolean allowEnch)
 	{	
 		boolean cachedEnch = allowEnchants;
 		allowEnchants = allowEnch;//if false disables enchantments for vanilla IBakedModels
 		GlStateManager.pushMatrix();
+		
+		Block b = Block.getBlockFromItem(stack.getItem());
+		boolean flag = model.isGui3d() && b.getBlockLayer() == BlockRenderLayer.TRANSLUCENT;
+		if(flag)
+		{
+			GlStateManager.depthMask(false);//for things like ice rendering and crap
+		}
+		
 		if(isRunning)
 		{
 			translateDefault(false);
@@ -158,6 +173,11 @@ public class IItemRendererHandler {
 			applyTransforms(model);
 			renderItem.child.renderItem(stack, model);
 		}
+		
+	 	if(flag)
+	 	{
+	 		GlStateManager.depthMask(true);
+	 	}
 		GlStateManager.popMatrix();
 		allowEnchants = cachedEnch;
 	}

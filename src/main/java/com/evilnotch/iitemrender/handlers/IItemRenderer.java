@@ -35,7 +35,7 @@ public interface IItemRenderer {
 	 * @param type {@link TransformType} that will be/was used to transform model, if it is {@link IPerspectiveAwareModel}
 	 * @param partialTicks allows partialTicks to interpolate for animations usually the same as Minecraft.getMinecraft().getPartialTicks() unless someone manually renders your renderer
 	 */
-	public void render(ItemStack itemstack, IBakedModel model, TransformType type, float partialTicks);
+	public void render(ItemStack stack, IBakedModel model, TransformType type, float partialTicks);
 	
 	/**
 	 * return what type of preset open gl transformations will occur
@@ -52,9 +52,9 @@ public interface IItemRenderer {
 	/**
 	 * the faster render for your renderer
 	 */
-	public default void renderFast(ItemStack itemstack, IBakedModel model, TransformType type, float partialTicks)
+	public default void renderFast(ItemStack stack, IBakedModel model, TransformType type, float partialTicks)
 	{
-		render(itemstack, model, type, partialTicks);
+		render(stack, model, type, partialTicks);
 	}
 
 	/**
@@ -67,17 +67,17 @@ public interface IItemRenderer {
 	 * @param text {@link String} that replaces item stack's size, if not null
 	 * @return <b>TRUE</b> if rendering should proceed and default overlay should be rendered. <b>FALSE</b> if rendering should be cancelled.
 	 */
-	public default void renderOverlay(FontRenderer fr, ItemStack itemstack, int xPosition, int yPosition, @Nullable String text)
+	public default void renderOverlay(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text)
 	{
-		IItemRendererHandler.renderOverlay(fr, itemstack, xPosition, yPosition, text);
+		IItemRendererHandler.renderOverlay(fr, stack, xPosition, yPosition, text);
 	}
 	
 	/**
 	 * the faster render of renderOverlay used when Minecraft's game settings are not fancyGraphics
 	 */
-	public default void renderOverlayFast(FontRenderer fr, ItemStack itemstack, int xPosition, int yPosition, @Nullable String text)
+	public default void renderOverlayFast(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text)
 	{
-		renderOverlay(fr, itemstack, xPosition, yPosition, text);
+		renderOverlay(fr, stack, xPosition, yPosition, text);
 	}
 	
 	/**

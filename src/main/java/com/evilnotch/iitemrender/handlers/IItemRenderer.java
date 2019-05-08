@@ -45,6 +45,16 @@ public interface IItemRenderer {
 	public TransformPreset getTransformPreset();
 	
 	/**
+	 * This gets fired when your iitemrenderer is rendering another item and was unable to reset opn gl before 
+	 * continuing due to recursion. Example An item renders an entity which then enables cull. Entity Head starts to render an item you want cull to be disabled so you override this
+	 * do not use this for transforms(scaling,rotation,translate) as this will can get fired more then once without checks
+	 */
+	public default void restoreLastOpenGl()
+	{
+		
+	}
+	
+	/**
 	 * does your iitemrenderer support resource pack overrides. if it's a hook like silkspawners return false but, if it's like just a model like orespawn big bertha return true
 	 */
 //	public boolean allowRPOverride(ItemStack itemstack, IBakedModel model, TransformType type);

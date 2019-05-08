@@ -54,6 +54,14 @@ public class IItemRendererHandler {
 	 * this field gets updated when ForgeHooksClient#handleCameraTransforms()
 	 */
 	public static TransformType currentTransformType;
+	/**
+	 * this is always the first transform type at the start of the recursive loop of camera transitions
+	 */
+	public static TransformType cachedTransformType;
+	/**
+	 * gets set to current transform type after {@link IItemRenderer#restoreLastOpenGl()} is called.
+	 */
+	public static TransformType lastTransformType;
 	
 	/**
 	 * returns true if the RenderItemObj is currently running an object
@@ -120,12 +128,28 @@ public class IItemRendererHandler {
 		Item item = Item.getItemFromBlock(block);
 		register(item, renderer);
 	}
-
+	
+	/**
+	 * gets ran by ASM when forge handle camera transforms gets called
+	 */
 	public static void handleCameraTransforms(TransformType type)
 	{
-		currentTransformType = type;
+		//do not set the current transform types unless it's a vanilla forge handle camera transform call
+		if(!runTransforms)
+		{
+			updateTransforms(type);
+		}
 	}
 	
+	public static void updateTransforms(TransformType type) 
+	{
+		currentTransformType = type;
+		if(!isRunning)
+		{
+			cachedTransformType = type;
+		}
+	}
+
 	/**
 	 * render a vanilla itemstack
 	 */
@@ -262,7 +286,7 @@ public class IItemRendererHandler {
 	 */
 	public static void updateLastPos(TransformType t)
 	{
-        if(IItemRendererHandler.isGui(t) || IItemRendererHandler.isFirstPerson(t) || IItemRendererHandler.isUnkown(t))
+        if(IItemRendererHandler.isGui(t) || IItemRendererHandler.isFirstPerson(t))
         {
         	//if this renderes in a main menu or something don't break it with the player being null
         	if(renderItem.mc.player != null)
@@ -309,6 +333,7 @@ public class IItemRendererHandler {
 	 * disable this for rendering an IBakedModel and it won't render the effect then re-enable it
 	 */
 	public static boolean allowEnchants = true;
+	public static IItemRenderer lastRenderer = null;
 	
 	/**
 	 * do not call this outside of your model matrix
@@ -533,5 +558,11 @@ public class IItemRendererHandler {
 	public static boolean isHead(TransformType type)
 	{
 		return type == type.HEAD;
+	}
+
+	public static void restoreLastOpenGl()
+	{
+		if(lastRenderer != null)
+			lastRenderer.restoreLastOpenGl();
 	}
 }

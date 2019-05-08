@@ -41,11 +41,18 @@ public class RenderItemObj extends RenderItem {
 		if(IItemRendererHandler.isRunning)
 		{
 			 IItemRendererHandler.startBlurMipmap();//make sure in recursion loops this gets set and at the end of the loop it gets set with whatever it was before
+			 IItemRendererHandler.restoreLastOpenGl();
 		}
+		else
+		{
+			IItemRendererHandler.lastRenderer = null;//prevent confusion from ocuring
+		}
+		IItemRendererHandler.lastTransformType = IItemRendererHandler.currentTransformType;
 		
 		IItemRenderer renderer = IItemRendererHandler.get(itemstack);
 		if(renderer != null)
 		{
+			IItemRendererHandler.lastRenderer = renderer;
 			GlStateManager.pushMatrix();
 			
 			IItemRendererHandler.applyTransforms(renderer, model);

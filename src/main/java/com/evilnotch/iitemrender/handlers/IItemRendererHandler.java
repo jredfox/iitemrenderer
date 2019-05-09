@@ -138,10 +138,6 @@ public class IItemRendererHandler {
 	 */
 	public static void handleCameraTransforms(TransformType type, boolean leftHand)
 	{
-		if(type == null)
-		{
-			System.out.println("Why the FUCK YOU HERE BRO never use null types");
-		}
 		lastTransformType = currentTransformType != null ? currentTransformType : type;
 		currentTransformType = type;
 		leftHandHackery = leftHand;

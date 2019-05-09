@@ -122,33 +122,47 @@ public class RenderTransformer  implements IClassTransformer{
 		toInsert2.add(l1);
 		effects.instructions.insertBefore(spotEffect, toInsert2);
 	}
-
+	/**
+	 * 
+	 * @param classNode
+	 */
 	public static void patchCameraTransform(ClassNode classNode) 
 	{
 		  System.out.println("patching ForgeHooksClient#handleCameraTransforms");
 		  MethodNode camera = ASMHelper.getMethodNode(classNode, "handleCameraTransforms", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;Z)Lnet/minecraft/client/renderer/block/model/IBakedModel;");
 		 
 		  InsnList toInsert = new InsnList();
+		  //add hook so RenderItemObj knows what the current transform type is
 		  toInsert.add(new VarInsnNode(Opcodes.ALOAD,1));
 		  toInsert.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		  toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "handleCameraTransforms", "(Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;Z)V", false));
-	      camera.instructions.insertBefore(ASMHelper.getFirstInstruction(camera, Opcodes.ALOAD), toInsert);
-	      
-	      AbstractInsnNode[] arr = camera.instructions.toArray();
-	      JumpInsnNode spotIf = null;
-	      for(AbstractInsnNode ab : arr)
-	      {
-	    	  if(ab instanceof JumpInsnNode && ab.getOpcode() == Opcodes.IFNULL)
-	    	  {
-	    		  spotIf = (JumpInsnNode) ab;
-	    		  break;
-	    	  }
-	      }
-	      
-	      InsnList toInsert2 = new InsnList();
-	      toInsert2.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "runTransforms", "Z"));
-	      toInsert2.add(new JumpInsnNode(Opcodes.IFEQ, spotIf.label));
-	      camera.instructions.insert(spotIf, toInsert2);
+
+		  //add if(!IItemRendererHandler.runTransforms) return model.handlePerspective(model).getLeft();
+		  toInsert.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "runTransforms", "Z"));
+		  LabelNode l1 = new LabelNode();
+		  toInsert.add(new JumpInsnNode(Opcodes.IFNE, l1));
+		  LabelNode l2 = new LabelNode();
+		  toInsert.add(l2);
+		  toInsert.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		  toInsert.add(new VarInsnNode(Opcodes.ALOAD, 1));
+		  toInsert.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "net/minecraft/client/renderer/block/model/IBakedModel", "handlePerspective", "(Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;)Lorg/apache/commons/lang3/tuple/Pair;", true));
+		  toInsert.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "org/apache/commons/lang3/tuple/Pair", "getLeft", "()Ljava/lang/Object;", false));
+		  toInsert.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/client/renderer/block/model/IBakedModel"));
+		  toInsert.add(new InsnNode(Opcodes.ARETURN));
+		  toInsert.add(l1);
+		  //llib support
+		  AbstractInsnNode spot = camera.instructions.getFirst();
+		  if(spot instanceof LabelNode)
+		  {
+			  System.out.println("Insert After LabelNode");
+			  spot = spot.getNext();
+			  camera.instructions.insert(spot, toInsert);
+		  }
+		  else
+		  {
+			  System.out.println("Insert Before LabelNode");
+			  camera.instructions.insertBefore(spot, toInsert);
+		  }
 	}
 	
 	public static void patchMinecraft(ClassNode classNode) 

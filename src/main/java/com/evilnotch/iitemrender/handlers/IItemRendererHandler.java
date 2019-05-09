@@ -51,7 +51,7 @@ public class IItemRendererHandler {
 	public static Entity lastEntity;
 	
 	/**
-	 * this field gets updated when ForgeHooksClient#handleCameraTransforms()
+	 * this field gets updated when ForgeHooksClient#handleCameraTransforms() use with caution as this can change even during an iitemrenderer use lastTransformType or cachedTrasnformType
 	 */
 	public static TransformType currentTransformType;
 	/**
@@ -77,6 +77,10 @@ public class IItemRendererHandler {
 	 * internal do not manipulate yourself
 	 */
 	public static boolean leftHandHackery;
+	/**
+	 * the left hand hackery at the start of rendering your iitemrenderer
+	 */
+	public static boolean cachedLeftHandHackery;
 	
 	/**
 	 * it's 64 at see level rather then y of 0 so fake worlds could have a chance of simulating light if they felt like it
@@ -132,22 +136,28 @@ public class IItemRendererHandler {
 	/**
 	 * gets ran by ASM when forge handle camera transforms gets called
 	 */
-	public static void handleCameraTransforms(TransformType type)
+	public static void handleCameraTransforms(TransformType type, boolean leftHand)
 	{
-		//do not set the current transform types unless it's a vanilla forge handle camera transform call
-		if(!runTransforms)
+		if(type == null)
 		{
-			updateTransforms(type);
+			System.out.println("Why the FUCK YOU HERE BRO never use null types");
 		}
-	}
-	
-	public static void updateTransforms(TransformType type) 
-	{
+		lastTransformType = currentTransformType != null ? currentTransformType : type;
 		currentTransformType = type;
+		leftHandHackery = leftHand;
 		if(!isRunning)
 		{
 			cachedTransformType = type;
+			cachedLeftHandHackery = leftHand;
 		}
+	}
+	
+	/**
+	 * use this to restore last known Transform type that it started out with
+	 */
+	public static void restoreCachedTransforms()
+	{
+		handleCameraTransforms(cachedTransformType, cachedLeftHandHackery);
 	}
 
 	/**
@@ -355,7 +365,6 @@ public class IItemRendererHandler {
 			return;//prevent recursion loops or return if it's disabled
 		
 		enchants = true;
-        GlStateManager.color(r, g, b);
 		Minecraft mc = renderItem.mc;
         GlStateManager.depthMask(false);
         GlStateManager.depthFunc(514);
@@ -369,6 +378,7 @@ public class IItemRendererHandler {
         float f = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F / 8.0F;
         GlStateManager.translate(f, 0.0F, 0.0F);
         GlStateManager.rotate(-50.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.color(r, g, b);
         renderer.renderEffect(stack, model, type, partialTicks);
         GlStateManager.popMatrix();
         GlStateManager.pushMatrix();
@@ -376,6 +386,7 @@ public class IItemRendererHandler {
         float f1 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F / 8.0F;
         GlStateManager.translate(-f1, 0.0F, 0.0F);
         GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.color(r, g, b);
         renderer.renderEffect(stack, model, type, partialTicks);
         GlStateManager.popMatrix();
         GlStateManager.matrixMode(5888);
@@ -405,7 +416,6 @@ public class IItemRendererHandler {
 			return;//prevent recursion loops
 		
 		enchants = true;
-        GlStateManager.color(r, g, b);
 		Minecraft mc = renderItem.mc;
         GlStateManager.depthMask(false);
         GlStateManager.depthFunc(514);
@@ -419,6 +429,7 @@ public class IItemRendererHandler {
         float f = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F / 8.0F;
         GlStateManager.translate(f, 0.0F, 0.0F);
         GlStateManager.rotate(-50.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.color(r, g, b);
         stack.getItem().getTileEntityItemStackRenderer().renderByItem(stack);
         GlStateManager.popMatrix();
         GlStateManager.pushMatrix();
@@ -426,6 +437,7 @@ public class IItemRendererHandler {
         float f1 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F / 8.0F;
         GlStateManager.translate(-f1, 0.0F, 0.0F);
         GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.color(r, g, b);
         stack.getItem().getTileEntityItemStackRenderer().renderByItem(stack);
         GlStateManager.popMatrix();
         GlStateManager.matrixMode(5888);
@@ -474,8 +486,13 @@ public class IItemRendererHandler {
 	 */
 	public static void applyTransforms(IBakedModel model) 
 	{
+		applyTransforms(model, IItemRendererHandler.currentTransformType, IItemRendererHandler.leftHandHackery);
+	}
+	
+	public static void applyTransforms(IBakedModel model, TransformType transformType, boolean leftHandHackery) 
+	{
 		IItemRendererHandler.runTransforms = true;
-		ForgeHooksClient.handleCameraTransforms(model, IItemRendererHandler.currentTransformType, IItemRendererHandler.leftHandHackery);
+		ForgeHooksClient.handleCameraTransforms(model, transformType, leftHandHackery);
 		IItemRendererHandler.runTransforms = false;
 	}
 	
@@ -486,6 +503,16 @@ public class IItemRendererHandler {
 	{
 		translateDefault(false);
 		applyTransforms(model);
+		translateDefault(true);
+	}
+
+	/**
+	 * if you want your iitemrenderer to conform to transforms of the IBakedModel call this
+	 */
+	public static void applyTransformPreset(IBakedModel model, TransformType transformType, boolean leftHandHackery)
+	{
+		translateDefault(false);
+		applyTransforms(model, transformType, leftHandHackery);
 		translateDefault(true);
 	}
 	

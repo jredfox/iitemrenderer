@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformT
 import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -37,6 +38,13 @@ public class RenderItemObj extends RenderItem {
 	@Override
 	public void renderItem(ItemStack itemstack, IBakedModel model)
 	{	
+		if(itemstack.getItem() == Items.AIR)
+			return;
+		if(IItemRendererHandler.currentTransformType == null)
+			throw new RuntimeException("currentTransform Type Should Never be null");
+		else if(model == null)
+			throw new RuntimeException("IBakedModel Should Never be null");
+		
         IItemRendererHandler.updateMipMap();//sync mipmaps if not in recursion loop
 		if(IItemRendererHandler.isRunning)
 		{
@@ -47,7 +55,6 @@ public class RenderItemObj extends RenderItem {
 		{
 			IItemRendererHandler.lastRenderer = null;//prevent confusion from ocuring
 		}
-		IItemRendererHandler.lastTransformType = IItemRendererHandler.currentTransformType;
 		
 		IItemRenderer renderer = IItemRendererHandler.get(itemstack);
 		if(renderer != null)

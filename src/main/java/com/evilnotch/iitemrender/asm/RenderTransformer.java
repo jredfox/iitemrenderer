@@ -107,13 +107,6 @@ public class RenderTransformer  implements IClassTransformer{
 		//add IItemRendererHandler.applyGlTranslates(model) to RenderItem#renderItem
 		System.out.println("patching RenderItem.class");
 		
-//		MethodNode renderItem = ASMHelper.getMethodNode(classNode, new MCPSidedString("renderItem", "func_180454_a").toString(), "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/block/model/IBakedModel;)V");
-//		AbstractInsnNode spotRenderItem = ASMHelper.getMethodInsnNode(renderItem, Opcodes.INVOKESTATIC, "net/minecraft/client/renderer/GlStateManager", new MCPSidedString("pushMatrix", "func_179094_E").toString(), "()V", false);
-//		InsnList toInsert = new InsnList();
-//		toInsert.add(new VarInsnNode(ALOAD, 2));
-//		toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "applyTransforms", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;)V", false));
-//		renderItem.instructions.insert(spotRenderItem, toInsert);
-		
 		//disable enchantment effects
 		MethodNode effects = ASMHelper.getMethodNode(classNode, new MCPSidedString("renderEffect", "func_191966_a").toString(), "(Lnet/minecraft/client/renderer/block/model/IBakedModel;)V");
 		AbstractInsnNode spotEffect = ASMHelper.getFirstInstruction(effects, Opcodes.ICONST_0);
@@ -136,10 +129,9 @@ public class RenderTransformer  implements IClassTransformer{
 		  MethodNode camera = ASMHelper.getMethodNode(classNode, "handleCameraTransforms", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;Z)Lnet/minecraft/client/renderer/block/model/IBakedModel;");
 		 
 		  InsnList toInsert = new InsnList();
-		  toInsert.add(new VarInsnNode(ALOAD,1));
-		  toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC,"com/evilnotch/iitemrender/handlers/IItemRendererHandler", "handleCameraTransforms", "(Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;)V", false));
+		  toInsert.add(new VarInsnNode(Opcodes.ALOAD,1));
 		  toInsert.add(new VarInsnNode(Opcodes.ILOAD, 2));
-		  toInsert.add(new FieldInsnNode(Opcodes.PUTSTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "leftHandHackery", "Z"));
+		  toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "handleCameraTransforms", "(Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;Z)V", false));
 	      camera.instructions.insertBefore(ASMHelper.getFirstInstruction(camera, Opcodes.ALOAD), toInsert);
 	      
 	      AbstractInsnNode[] arr = camera.instructions.toArray();

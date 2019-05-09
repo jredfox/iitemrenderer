@@ -154,13 +154,11 @@ public class RenderTransformer  implements IClassTransformer{
 		  AbstractInsnNode spot = camera.instructions.getFirst();
 		  if(spot instanceof LabelNode)
 		  {
-			  System.out.println("Insert After LabelNode");
 			  spot = spot.getNext();
 			  camera.instructions.insert(spot, toInsert);
 		  }
 		  else
 		  {
-			  System.out.println("Insert Before LabelNode");
 			  camera.instructions.insertBefore(spot, toInsert);
 		  }
 	}

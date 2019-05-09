@@ -6,7 +6,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 
 @IFMLLoadingPlugin.Name("iitemrenderer-transformer_fixes")
-@IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE)
+@IFMLLoadingPlugin.SortingIndex(1010)
 @IFMLLoadingPlugin.MCVersion("1.12.2")
 @TransformerExclusions("com.evilnotch.iitemrender.asm.")
 public class Plugin implements IFMLLoadingPlugin

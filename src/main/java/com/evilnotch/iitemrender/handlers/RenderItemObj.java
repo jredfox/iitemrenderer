@@ -38,13 +38,6 @@ public class RenderItemObj extends RenderItem {
 	@Override
 	public void renderItem(ItemStack itemstack, IBakedModel model)
 	{	
-		if(itemstack.getItem() == Items.AIR)
-			return;
-		if(IItemRendererHandler.currentTransformType == null)
-			throw new RuntimeException("currentTransform Type Should Never be null");
-		else if(model == null)
-			throw new RuntimeException("IBakedModel Should Never be null");
-		
         IItemRendererHandler.updateMipMap();//sync mipmaps if not in recursion loop
 		if(IItemRendererHandler.isRunning)
 		{

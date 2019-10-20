@@ -44,10 +44,6 @@ public class RenderItemObj extends RenderItem {
 			 IItemRendererHandler.startBlurMipmap();//make sure in recursion loops this gets set and at the end of the loop it gets set with whatever it was before
 			 IItemRendererHandler.restoreLastOpenGl();
 		}
-		else
-		{
-			IItemRendererHandler.lastRenderer = null;//prevent confusion from ocuring
-		}
 		
 		IItemRenderer renderer = IItemRendererHandler.get(itemstack);
 		if(renderer != null)
@@ -74,6 +70,7 @@ public class RenderItemObj extends RenderItem {
     		IItemRendererHandler.isRunning = true;
             IItemRendererHandler.render(renderer, itemstack, model, t, pt);
     		IItemRendererHandler.isRunning = false;
+    		IItemRendererHandler.lastRenderer = null;//prevent confusion from ocuring
     		
 			GlStateManager.popMatrix();
 		}

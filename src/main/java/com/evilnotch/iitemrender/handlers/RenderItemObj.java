@@ -1,23 +1,13 @@
 package com.evilnotch.iitemrender.handlers;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.color.ItemColors;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.client.model.IModel;
 
 public class RenderItemObj extends RenderItem {
 	
@@ -43,6 +33,10 @@ public class RenderItemObj extends RenderItem {
 		{
 			 IItemRendererHandler.startBlurMipmap();//make sure in recursion loops this gets set and at the end of the loop it gets set with whatever it was before
 			 IItemRendererHandler.restoreLastOpenGl();
+		}
+		else
+		{
+			IItemRendererHandler.lastRenderer = null;//prevent confusion from ocuring
 		}
 		
 		IItemRenderer renderer = IItemRendererHandler.get(itemstack);
@@ -70,7 +64,6 @@ public class RenderItemObj extends RenderItem {
     		IItemRendererHandler.isRunning = true;
             IItemRendererHandler.render(renderer, itemstack, model, t, pt);
     		IItemRendererHandler.isRunning = false;
-    		IItemRendererHandler.lastRenderer = null;//prevent confusion from ocuring
     		
 			GlStateManager.popMatrix();
 		}

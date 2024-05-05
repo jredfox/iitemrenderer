@@ -137,19 +137,16 @@ public class RenderTransformer  implements IClassTransformer{
 		  toInsert.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		  toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "handleCameraTransforms", "(Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;Z)V", false));
 
-		  //add if(!IItemRendererHandler.runTransforms) return model.handlePerspective(model).getLeft();
+		  //add if(!IItemRendererHandler.runTransforms) return model;
 		  toInsert.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "runTransforms", "Z"));
 		  LabelNode l1 = new LabelNode();
 		  toInsert.add(new JumpInsnNode(Opcodes.IFNE, l1));
 		  LabelNode l2 = new LabelNode();
 		  toInsert.add(l2);
 		  toInsert.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		  toInsert.add(new VarInsnNode(Opcodes.ALOAD, 1));
-		  toInsert.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "net/minecraft/client/renderer/block/model/IBakedModel", "handlePerspective", "(Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;)Lorg/apache/commons/lang3/tuple/Pair;", true));
-		  toInsert.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "org/apache/commons/lang3/tuple/Pair", "getLeft", "()Ljava/lang/Object;", false));
-		  toInsert.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/client/renderer/block/model/IBakedModel"));
 		  toInsert.add(new InsnNode(Opcodes.ARETURN));
 		  toInsert.add(l1);
+		  
 		  //llib support
 		  AbstractInsnNode spot = camera.instructions.getFirst();
 		  if(spot instanceof LabelNode)

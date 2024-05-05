@@ -40,7 +40,7 @@ public class IItemRendererHandler {
 	public static boolean lastMipmap;
 	
 	public static double lastX;
-	public static double lastY;
+	public static double lastY = 64;
 	public static double lastZ;
 	public static double lastYaw;
 	public static double lastPitch;

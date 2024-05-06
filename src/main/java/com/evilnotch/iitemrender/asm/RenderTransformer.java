@@ -137,8 +137,9 @@ public class RenderTransformer  implements IClassTransformer{
 		  toInsert.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		  toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "handleCameraTransforms", "(Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;Z)V", false));
 
-		  //add if(!IItemRendererHandler.runTransforms) return model;
-		  toInsert.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "runTransforms", "Z"));
+		  //add if(!IItemRendererHandler.canRunTransforms(model)) return model;
+		  toInsert.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		  toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "canRunTransforms", "(Lnet/minecraft/client/renderer/block/model/IBakedModel;)Z", false));
 		  LabelNode l1 = new LabelNode();
 		  toInsert.add(new JumpInsnNode(Opcodes.IFNE, l1));
 		  LabelNode l2 = new LabelNode();

@@ -1,13 +1,14 @@
 package com.evilnotch.iitemrender.handlers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.evilnotch.iitemrender.handlers.IItemRenderer.TransformPreset;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockMobSpawner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -493,6 +494,28 @@ public class IItemRendererHandler {
 	}
 	
 	/**
+	 * Tells {@link ForgeHooksClient#handleCameraTransforms(IBakedModel, TransformType, boolean)} can run or not
+	 */
+	public static boolean HasBLT;
+	public static List<Class<? extends IBakedModel>> BLT = new ArrayList();
+	public static boolean canRunTransforms(IBakedModel model) 
+	{
+		return HasBLT && hasBLT(model) || runTransforms;
+	}
+	
+	public static boolean hasBLT(IBakedModel m)
+	{
+		for(Class<? extends IBakedModel> c : BLT)
+		{
+			if(c.isInstance(m))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * if you want your iitemrenderer to conform to transforms of the IBakedModel call this
 	 */
 	public static void applyTransformPreset(IBakedModel model)
@@ -588,4 +611,5 @@ public class IItemRendererHandler {
 		if(lastRenderer != null)
 			lastRenderer.restoreLastOpenGl();
 	}
+
 }

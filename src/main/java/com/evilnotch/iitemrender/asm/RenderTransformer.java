@@ -148,17 +148,10 @@ public class RenderTransformer  implements IClassTransformer{
 		  toInsert.add(new InsnNode(Opcodes.ARETURN));
 		  toInsert.add(l1);
 		  
-		  //llib support
-		  AbstractInsnNode spot = camera.instructions.getFirst();
-		  if(spot instanceof LabelNode)
-		  {
-			  spot = spot.getNext();
-			  camera.instructions.insert(spot, toInsert);
-		  }
-		  else
-		  {
-			  camera.instructions.insertBefore(spot, toInsert);
-		  }
+		  //Inject code after Pair<? extends IBakedModel, Matrix4f> pair = model.handlePerspective(cameraTransformType);
+		  MethodInsnNode targ = ASMHelper.getFirstMethodInsn(camera, Opcodes.INVOKEINTERFACE, "net/minecraft/client/renderer/block/model/IBakedModel", "handlePerspective", "(Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;)Lorg/apache/commons/lang3/tuple/Pair;", true);
+		  AbstractInsnNode spot = targ.getPrevious().getPrevious();
+		  camera.instructions.insertBefore(spot, toInsert);
 	}
 	
 	public static void patchMinecraft(ClassNode classNode) 

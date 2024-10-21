@@ -12,10 +12,26 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions
 public class Plugin implements IFMLLoadingPlugin
 {
 
+	public static boolean hasChecked = false;
+	public static boolean hasLib = true;
+	
 	@Override
 	public String[] getASMTransformerClass() 
 	{
-		return new String[]{"com.evilnotch.iitemrender.asm.RenderTransformer"};
+		if(!hasChecked)
+		{
+			try
+			{
+				Class.forName("com.evilnotch.lib.asm.util.ASMHelper");
+			}
+			catch(Throwable t)
+			{
+				t.printStackTrace();
+				hasLib = false;
+			}
+			hasChecked = true;
+		}
+		return hasLib ? new String[]{"com.evilnotch.iitemrender.asm.RenderTransformer"} : null;
 	}
 
 	@Override

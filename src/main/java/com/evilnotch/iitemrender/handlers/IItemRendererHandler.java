@@ -71,7 +71,7 @@ public class IItemRendererHandler {
 	/**
 	 * returns true if the RenderItemObj is currently running an object
 	 */
-	public static volatile boolean isRunning;
+	public static boolean isRunning;
 	
 	/**
 	 * tell whether or not ForgeHooksClient#handleCameraTransforms() can run the open gl transforms(scaling,translates,rotations)

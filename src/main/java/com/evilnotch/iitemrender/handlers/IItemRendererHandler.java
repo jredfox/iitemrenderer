@@ -71,7 +71,7 @@ public class IItemRendererHandler {
 	/**
 	 * returns true if the RenderItemObj is currently running an object
 	 */
-	public static boolean isRunning;
+	public static volatile boolean isRunning;
 	
 	/**
 	 * tell whether or not ForgeHooksClient#handleCameraTransforms() can run the open gl transforms(scaling,translates,rotations)
@@ -200,7 +200,7 @@ public class IItemRendererHandler {
 		{
 			translateDefault(false);
 			applyTransforms(model);
-		 	renderItem.child.renderItem(stack, model);
+			renderItem.child.renderItem(stack, model);
 		 	translateDefault(true);
 		}
 		else

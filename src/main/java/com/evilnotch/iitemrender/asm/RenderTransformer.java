@@ -13,6 +13,7 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -49,9 +50,6 @@ public class RenderTransformer  implements IClassTransformer{
 	    return index != -1 ? transform(index, basicClass, FMLCorePlugin.isObf) : basicClass;
 	}
 	
-	/**
-	 * f**k jei
-	 */
 	public byte[] transform(int index, byte[] basicClass, boolean obfuscated) 
 	{
 		try 
@@ -104,7 +102,6 @@ public class RenderTransformer  implements IClassTransformer{
 
 	public static void patchRenderItem(ClassNode classNode) 
 	{	
-		//add IItemRendererHandler.applyGlTranslates(model) to RenderItem#renderItem
 		System.out.println("patching RenderItem.class");
 		
 		//disable enchantment effects
@@ -122,6 +119,7 @@ public class RenderTransformer  implements IClassTransformer{
 		toInsert2.add(l1);
 		effects.instructions.insertBefore(spotEffect, toInsert2);
 	}
+	
 	/**
 	 * 
 	 * @param classNode
@@ -133,7 +131,7 @@ public class RenderTransformer  implements IClassTransformer{
 		 
 		  InsnList toInsert = new InsnList();
 		  //add hook so RenderItemObj knows what the current transform type is
-		  toInsert.add(new VarInsnNode(Opcodes.ALOAD,1));
+		  toInsert.add(new VarInsnNode(Opcodes.ALOAD, 1));
 		  toInsert.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		  toInsert.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/evilnotch/iitemrender/handlers/IItemRendererHandler", "handleCameraTransforms", "(Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;Z)V", false));
 
@@ -150,11 +148,10 @@ public class RenderTransformer  implements IClassTransformer{
 		  
 		  //Inject code after Pair<? extends IBakedModel, Matrix4f> pair = model.handlePerspective(cameraTransformType);
 		  MethodInsnNode targ = ASMHelper.getFirstMethodInsn(camera, Opcodes.INVOKEINTERFACE, "net/minecraft/client/renderer/block/model/IBakedModel", "handlePerspective", "(Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;)Lorg/apache/commons/lang3/tuple/Pair;", true);
-		  AbstractInsnNode spot = targ.getPrevious().getPrevious();
-		  camera.instructions.insertBefore(spot, toInsert);
+		  camera.instructions.insert(previousLabel(targ), toInsert);
 	}
 	
-	public static void patchMinecraft(ClassNode classNode) 
+	public static void patchMinecraft(ClassNode classNode)
 	{
 		  System.out.println("patching Minecraft.class for custom RenderItem");
 		  MethodNode method = ASMHelper.getMethodNode(classNode, new MCPSidedString("init", "func_71384_a").toString(), "()V");
@@ -219,6 +216,23 @@ public class RenderTransformer  implements IClassTransformer{
 		toInsert.add(l1);
 		
 		node.instructions.insertBefore(start, toInsert);
+	}
+	
+	/**
+	 * Gets the previous LineNumberNode or LabelNode whichever comes first
+	 */
+	public static AbstractInsnNode previousLabel(AbstractInsnNode l)
+	{
+		AbstractInsnNode current = l;
+		while(current != null)
+		{
+			current = current.getPrevious();
+			if(current instanceof LineNumberNode || current instanceof LabelNode)
+			{
+				return current;
+			}
+		}
+		return null;
 	}
 
 }

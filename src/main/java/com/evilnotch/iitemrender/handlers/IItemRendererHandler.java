@@ -1,8 +1,7 @@
 package com.evilnotch.iitemrender.handlers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +29,11 @@ public class IItemRendererHandler {
 
 	private static Map<Item, IItemRenderer> registry = new HashMap<>();
 	public static RenderItemObj renderItem;
+	/**
+	 * An IBakedModel cache that tells {@link ForgeHooksClient#handleCameraTransforms(IBakedModel, TransformType, boolean)} to not apply transforms
+	 * This is dynamically populated and works regardless of IBakedModel Wrappers or unexpected overrides. It should Be compatible with Everything that works with the 1.8+ wheel
+	 */
+	public static Set<IBakedModel> cache = new HashSet();
 	
 	/**
 	 * mipmapping lastBlur before starting this rendering process
@@ -496,23 +500,9 @@ public class IItemRendererHandler {
 	/**
 	 * Tells {@link ForgeHooksClient#handleCameraTransforms(IBakedModel, TransformType, boolean)} can run or not
 	 */
-	public static boolean HasBLT;
-	public static List<Class<? extends IBakedModel>> BLT = new ArrayList();
 	public static boolean canRunTransforms(IBakedModel model) 
 	{
-		return HasBLT && hasBLT(model) || runTransforms;
-	}
-	
-	public static boolean hasBLT(IBakedModel m)
-	{
-		for(Class<? extends IBakedModel> c : BLT)
-		{
-			if(c.isInstance(m))
-			{
-				return true;
-			}
-		}
-		return false;
+		return !cache.contains(model) || runTransforms;
 	}
 	
 	/**
@@ -553,13 +543,13 @@ public class IItemRendererHandler {
 	public static void applyTransforms(IItemRenderer renderer, IBakedModel vanilla) 
 	{
 		TransformPreset preset = renderer.getTransformPreset();
-		if(preset == TransformPreset.NONE)
-		{
-			return;
-		}
-		else if(preset == TransformPreset.FIXED)
+		if(preset == TransformPreset.FIXED)
 		{
 			applyLegacyTransforms(currentTransformType);
+		}
+		else if(preset == TransformPreset.VANILLA)
+		{
+			applyTransforms(vanilla);
 		}
 	}
 
@@ -611,5 +601,4 @@ public class IItemRendererHandler {
 		if(lastRenderer != null)
 			lastRenderer.restoreLastOpenGl();
 	}
-
 }

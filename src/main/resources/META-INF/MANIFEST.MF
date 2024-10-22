@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+FMLCorePluginContainsFMLMod: false
+FMLAT: iitemrenderer_at.cfg
+FMLCorePlugin: com.evilnotch.iitemrender.asm.Plugin
+

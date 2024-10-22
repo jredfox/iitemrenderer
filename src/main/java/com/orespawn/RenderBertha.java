@@ -41,14 +41,14 @@ public class RenderBertha implements IItemRenderer {
 
    @Override
    public void render(ItemStack stack, IBakedModel model, TransformType type, float partialTicks) 
-   {  
-	   if(type == TransformType.FIRST_PERSON_LEFT_HAND || type == TransformType.FIRST_PERSON_RIGHT_HAND)
+   {
+	   /*if(type == TransformType.FIRST_PERSON_LEFT_HAND || type == TransformType.FIRST_PERSON_RIGHT_HAND)
 	   {
 		   this.renderSword(6.0F, 3.0F, -5.0F, 0.25F);
 		   if(stack.hasEffect())
 			   IItemRendererHandler.renderEffect(this, stack, model, type, partialTicks);
 	   }
-	   else if(type == type.THIRD_PERSON_RIGHT_HAND || type == type.THIRD_PERSON_LEFT_HAND)
+	   else */if(type != type.GUI || type == type.THIRD_PERSON_RIGHT_HAND || type == type.THIRD_PERSON_LEFT_HAND)
 	   {   
 		   this.renderSwordF5(-4.0F, 2.0F, -3.0F, 0.25F);
 		   if(stack.hasEffect())

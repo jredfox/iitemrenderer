@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.model.IModel;
 
 public class RenderItemObj extends RenderItem {
 	
@@ -42,6 +41,12 @@ public class RenderItemObj extends RenderItem {
 		IItemRenderer renderer = IItemRendererHandler.get(itemstack);
 		if(renderer != null)
 		{
+			if(!IItemRendererHandler.cache.contains(model))
+			{
+				IItemRendererHandler.cache.add(model);
+				return;
+			}
+			
 			IItemRendererHandler.lastRenderer = renderer;
 			GlStateManager.pushMatrix();
 			
@@ -70,7 +75,6 @@ public class RenderItemObj extends RenderItem {
 		else
 		{
 			GlStateManager.pushMatrix();
-			IItemRendererHandler.applyTransforms(model);
 			this.child.renderItem(itemstack, model);
 			GlStateManager.popMatrix();
 		}

@@ -3,7 +3,6 @@ package com.evilnotch.iitemrender.handlers;
 import javax.annotation.Nullable;
 
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
@@ -102,6 +101,7 @@ public interface IItemRenderer {
 	public static enum TransformPreset
 	{
 		FIXED(),
+		VANILLA(),
 		NONE();
 	}
 

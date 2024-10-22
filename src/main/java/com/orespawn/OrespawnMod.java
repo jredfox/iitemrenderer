@@ -6,6 +6,7 @@ import com.evilnotch.lib.minecraft.basicmc.item.BasicItem;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
@@ -22,6 +23,7 @@ public class OrespawnMod {
 	{
 		Item item = new BasicItem(new ResourceLocation(MODID, "bertha"), CreativeTabs.REDSTONE, new LangEntry("en_us", "Bertha"));
 		IItemRendererHandler.register(item, new RenderBertha());
+		IItemRendererHandler.register(Blocks.STONE, new RenderBertha());
 	}
 
 }

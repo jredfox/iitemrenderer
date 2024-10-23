@@ -27,15 +27,18 @@ public class RenderItemObj extends RenderItem {
 	@Override
 	public void renderItem(ItemStack itemstack, IBakedModel model)
 	{	
+		boolean isRunning = IItemRendererHandler.isRunning;
+		IItemRendererHandler.firstRun = !isRunning;
+		
         IItemRendererHandler.updateMipMap();//sync mipmaps if not in recursion loop
-		if(IItemRendererHandler.isRunning)
+		if(isRunning)
 		{
 			 IItemRendererHandler.startBlurMipmap();//make sure in recursion loops this gets set and at the end of the loop it gets set with whatever it was before
 			 IItemRendererHandler.restoreLastOpenGl();
 		}
 		else
 		{
-			IItemRendererHandler.lastRenderer = null;//prevent confusion from ocuring
+        	IItemRendererHandler.lastRenderer = null;//prevent confusion from ocuring
 		}
 		
 		IItemRenderer renderer = IItemRendererHandler.get(itemstack);
@@ -68,7 +71,8 @@ public class RenderItemObj extends RenderItem {
             
     		IItemRendererHandler.isRunning = true;
             IItemRendererHandler.render(renderer, itemstack, model, t, pt);
-    		IItemRendererHandler.isRunning = false;
+            if(!isRunning)
+            	IItemRendererHandler.isRunning = false;
     		
 			GlStateManager.popMatrix();
 		}

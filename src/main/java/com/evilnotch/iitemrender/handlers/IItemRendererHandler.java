@@ -38,11 +38,11 @@ public class IItemRendererHandler {
 	/**
 	 * mipmapping lastBlur before starting this rendering process
 	 */
-	public static boolean lastBlur;
+	public static volatile boolean lastBlur;
 	/**
 	 * mipmapping lastMipMap before starting this rendering process
 	 */
-	public static boolean lastMipmap;
+	public static volatile boolean lastMipmap;
 	
 	public static double lastX;
 	public static double lastY = 64;
@@ -71,21 +71,26 @@ public class IItemRendererHandler {
 	/**
 	 * returns true if the RenderItemObj is currently running an object
 	 */
-	public static boolean isRunning;
+	public static volatile boolean isRunning;
+	
+	/**
+	 * returns true if and only if your IItemRendererHandler is at the top of the recursion of rendering
+	 */
+	public static volatile boolean firstRun = true;
 	
 	/**
 	 * tell whether or not ForgeHooksClient#handleCameraTransforms() can run the open gl transforms(scaling,translates,rotations)
 	 */
-	public static boolean runTransforms;
+	public static volatile boolean runTransforms;
 	
 	/**
 	 * internal do not manipulate yourself
 	 */
-	public static boolean leftHandHackery;
+	public static volatile boolean leftHandHackery;
 	/**
 	 * the left hand hackery at the start of rendering your iitemrenderer
 	 */
-	public static boolean cachedLeftHandHackery;
+	public static volatile boolean cachedLeftHandHackery;
 	
 	/**
 	 * it's 64 at see level rather then y of 0 so fake worlds could have a chance of simulating light if they felt like it

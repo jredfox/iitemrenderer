@@ -33,7 +33,7 @@ public class IItemRendererHandler {
 	 * An IBakedModel cache that tells {@link ForgeHooksClient#handleCameraTransforms(IBakedModel, TransformType, boolean)} to not apply transforms
 	 * This is dynamically populated and works regardless of IBakedModel Wrappers or unexpected overrides. It should Be compatible with Everything that works with the 1.8+ wheel
 	 */
-	public static Set<IBakedModel> cache = new HashSet();
+	public static Set<IBakedModel> cache = new HashSet<>();
 	
 	/**
 	 * mipmapping lastBlur before starting this rendering process
